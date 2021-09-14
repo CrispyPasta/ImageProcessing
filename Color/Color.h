@@ -11,7 +11,7 @@
 
 class Color {
 private:
-    Matrix RGBtoXYZ = Matrix(3, 3);
+    Matrix<double> RGBtoXYZ = Matrix<double>(3, 3);
 
     double RGBtoXYZmat[3][3] = {
             {0.4124, 0.3576, 0.1805},

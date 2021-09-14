@@ -8,6 +8,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(ImageProcessing main.cpp Matrix/Matrix.cpp Matrix/Matrix.h Color/Color.cpp Color/Color.h)
+add_executable(ImageProcessing main.cpp Matrix/Matrix.h Matrix/Matrix.cpp Color/Color.cpp)
 
 target_link_libraries( ImageProcessing ${OpenCV_LIBS} )

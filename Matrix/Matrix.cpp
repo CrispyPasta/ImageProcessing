@@ -6,14 +6,21 @@
 #include "Matrix.h"
 using namespace std;
 
-Matrix::Matrix() {
+template <typename T>
+Matrix<T>::Matrix() {
     *this = Matrix(3, 3, 0.0);
 }
 
-Matrix::Matrix(int Rows, int Cols, int data[]){
-    Matrix(Rows, Cols, 0.0);
-    int i = 0;
+template <typename T>
+Matrix<T>::Matrix(int Rows, int Cols, T* data){
+    rows = Rows;
+    cols = Cols;
+    mat = new T*[rows];
+    for (int a = 0; a < rows; a++){
+        mat[a] = new T[cols];
+    } //don't doubt this my boy
 
+    int i = 0;  //counter to iterate through the data
     for (int a = 0; a < Rows; a++){
         for (int b = 0; b < Cols; b++){
             if (i >= Rows * Cols){
@@ -26,13 +33,14 @@ Matrix::Matrix(int Rows, int Cols, int data[]){
 }
 
 //constructor
-Matrix::Matrix(int r, int c, double i) {
+template <typename T>
+Matrix<T>::Matrix(int r, int c, T i) {
     rows = r;
     cols = c;
 
-    mat = new double*[rows];
+    mat = new T*[rows];
     for (int a = 0; a < rows; a++){
-        mat[a] = new double[cols];
+        mat[a] = new T[cols];
     } //don't doubt this my boy
 
     for (int a = 0; a < rows; a++){
@@ -43,13 +51,14 @@ Matrix::Matrix(int r, int c, double i) {
 }
 
 //copy constructor
-Matrix::Matrix(const Matrix &copy) {
+template <typename T>
+Matrix<T>::Matrix(const Matrix &copy) {
     this->rows  = copy.rows;
     this->cols  = copy.cols;
 
-    this->mat = new double*[rows];
+    this->mat = new T*[rows];
     for (int a = 0; a < cols; a++){
-        mat[a] = new double[cols];
+        mat[a] = new T[cols];
     }
 
     for (int a = 0; a < rows; a++){
@@ -61,7 +70,8 @@ Matrix::Matrix(const Matrix &copy) {
 
 //convolution operator where M1 is the Kernel and M2 is the image
 //returns one value because convolution returns a scalar value and not another matrix
-double Matrix::convolve(Matrix &m1, Matrix &m2) {
+template <typename T>
+double Matrix<T>::convolve(Matrix &m1, Matrix &m2) {
     if ((m1.rows != m1.cols) || (m2.rows != m2.cols)){
         string error = "* * * * * * * ERROR * * * * * * *\n";
         error += "One or both of the matrices are asymmetrical.\n";
@@ -89,7 +99,8 @@ double Matrix::convolve(Matrix &m1, Matrix &m2) {
     return result;
 }
 
-Matrix& Matrix::operator+(const Matrix &m) {
+template <typename T>
+Matrix<T>& Matrix<T>::operator+(const Matrix &m) {
     if ((this->rows != m.rows) || (this->cols != m.cols)){
         string message = "";
         message += "The dimensions of the matrices don't match: ";
@@ -108,7 +119,8 @@ Matrix& Matrix::operator+(const Matrix &m) {
     }
 }
 
-Matrix &Matrix::operator-(const Matrix &m) {
+template <typename T>
+Matrix<T> &Matrix<T>::operator-(const Matrix &m) {
     if ((this->rows != m.rows) || (this->cols != m.cols)){
         string message = "";
         message += "The dimensions of the matrices don't match: ";
@@ -128,7 +140,8 @@ Matrix &Matrix::operator-(const Matrix &m) {
 }
 
 //matrix multiplication function
-Matrix &Matrix::operator*(const Matrix &m) {
+template <typename T>
+Matrix<T> &Matrix<T>::operator*(const Matrix &m) {
     if (this->cols != m.rows){
         string error = "* * * * * * * ERROR * * * * * * *\n";
         error += "Matrix dimensions incompatible for multiplication.\n";
@@ -153,7 +166,8 @@ Matrix &Matrix::operator*(const Matrix &m) {
 }
 
 //multiply matrix by constant value
-void Matrix::operator*=(int m) {
+template <typename T>
+void Matrix<T>::operator*=(int m) {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] *= m;
@@ -162,7 +176,8 @@ void Matrix::operator*=(int m) {
 }
 
 //multiply matrix by constant value
-void Matrix::operator*=(double m) {
+template <typename T>
+void Matrix<T>::operator*=(double m) {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] *= m;
@@ -171,13 +186,14 @@ void Matrix::operator*=(double m) {
 }
 
 //assignment operator (assign matrix to other matrix)
-void Matrix::operator=(const Matrix &m) {
+template <typename T>
+void Matrix<T>::operator=(const Matrix &m) {
     this->rows = m.rows;
     this->cols = m.cols;
 
-    this->mat = new double*[rows];
+    this->mat = new T*[rows];
     for (int a = 0; a < cols; a++){
-        this->mat[a] = new double[cols];
+        this->mat[a] = new T[cols];
     }
 
     for (int a = 0; a < rows; a++){
@@ -188,7 +204,8 @@ void Matrix::operator=(const Matrix &m) {
 }
 
 //Sets all values in the matrix to the value given
-void Matrix::operator=(const int i) {
+template <typename T>
+void Matrix<T>::operator=(const int i) {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] = i;
@@ -197,7 +214,8 @@ void Matrix::operator=(const int i) {
 }
 
 //Sets all values in the matrix to the value given
-void Matrix::operator=(const double d) {
+template <typename T>
+void Matrix<T>::operator=(const double d) {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] = d;
@@ -205,21 +223,26 @@ void Matrix::operator=(const double d) {
     }
 }
 
-void Matrix::print(const string& caption, int width) const{
+template <typename T>
+void Matrix<T>::print(const string& caption, int width) const{
     cout << caption << endl;
     for (int a = 0; a < rows; a++){
         cout << left;
         cout << "| ";
         for (int b = 0; b < cols; b++){
-            cout << setw(width) << mat[a][b] << " ";
+            cout << setw(width) << to_string(mat[a][b]) << " ";
         }
         cout << " |" << endl;
     }
 }
 
-Matrix::~Matrix() {
+template <typename T>
+Matrix<T>::~Matrix() {
     for (int a = 0; a < rows; a++){
         delete mat[a];
     }
     delete mat;
 }
+
+template class Matrix<int>;
+template class Matrix<double>;

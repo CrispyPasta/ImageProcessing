@@ -3,9 +3,7 @@
 //
 
 #include "Color.h"
-
 #include <iostream>
-#include "Color.h"
 using namespace std;
 using namespace cv;
 
@@ -22,7 +20,7 @@ Color::Color() {
     RGBtoXYZ.mat[2][1] = 0.1192;
     RGBtoXYZ.mat[2][2] = 0.9505;
 
-    RGBtoXYZ.print("RGB to XYZ conversion matrix", 6);
+    RGBtoXYZ.print("RGB to XYZ conversion matrix", 7);
 }
 
 void Color::rgbtoxyz(int* RGB) {

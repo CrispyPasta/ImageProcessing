@@ -16,7 +16,7 @@ void readImage(){
         cout << "Oh no the snep was sleeping\n";
         return;
     }
-    cout << "The snep has been summoned.\n";
+    cout << "The snep has been summoned!\n";
 }
 
 int main() {
@@ -31,10 +31,13 @@ int main() {
         test[a] = a + 1;
     }
 
-    //    Matrix newconstructor = Matrix(3,3, test);
-
     cout << Color::linearizeRGB(255) << endl;
     cout << Color::linearizeRGB(41) << endl;
     cout << Color::linearizeRGB(10) << endl;
+
+    Matrix<int> newconstructor = Matrix<int>(3,3, test);
+    newconstructor.print("Testing new constructor", 4);
+    Matrix<double> mat = Matrix<double>();
+    mat.print("Mat");
     return 0;
 }
