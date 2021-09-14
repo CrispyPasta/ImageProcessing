@@ -8,19 +8,7 @@ using namespace std;
 using namespace cv;
 
 Color::Color() {
-    RGBtoXYZ.mat[0][0] = 0.4124;
-    RGBtoXYZ.mat[0][1] = 0.3576;
-    RGBtoXYZ.mat[0][2] = 0.1805;
 
-    RGBtoXYZ.mat[1][0] = 0.2126;
-    RGBtoXYZ.mat[1][1] = 0.7152;
-    RGBtoXYZ.mat[1][2] = 0.0722;
-
-    RGBtoXYZ.mat[2][0] = 0.0193;
-    RGBtoXYZ.mat[2][1] = 0.1192;
-    RGBtoXYZ.mat[2][2] = 0.9505;
-
-    RGBtoXYZ.print("RGB to XYZ conversion matrix", 7);
 }
 
 void Color::rgbtoxyz(int* RGB) {

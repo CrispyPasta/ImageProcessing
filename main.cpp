@@ -19,12 +19,38 @@ void readImage(){
     cout << "The snep has been summoned!\n";
 }
 
+void testMatrixFunctions(){
+    Matrix<double> mat = Matrix<double>();
+    mat.print("Mat");
+
+    Matrix<int> m1 = Matrix<int>(2, 3, -1);
+    Matrix<int> m2 = Matrix<int>(3, 2, 7);
+
+    m1.print("M1", 4);
+    m2.print("M2", 4);
+
+    try{
+        Matrix<int> m3 = m1 * m2;
+        m3.print("M3 = M1 * M2");
+    } catch (string& s) {
+        cout << s << endl;
+    }
+
+    Matrix<int> kernel = Matrix<int>(3,3, 1);
+    Matrix<int> image2 = Matrix<int>(3, 3, 2);
+
+    try{
+        double middleVal = Matrix<int>::convolve(kernel, image2);
+        cout << "Result of convolution = " << to_string(middleVal) << endl;
+    } catch (string e) {
+        cout << e;
+    }
+}
+
 int main() {
     int RGB[] = {251, 165, 45};
     Color::rgbtoxyz(RGB);
     cout << RGB[0] << endl;
-
-    Color c = Color();
 
     int test[9];
     for (int a = 0; a < 9; a++){
@@ -35,9 +61,6 @@ int main() {
     cout << Color::linearizeRGB(41) << endl;
     cout << Color::linearizeRGB(10) << endl;
 
-    Matrix<int> newconstructor = Matrix<int>(3,3, test);
-    newconstructor.print("Testing new constructor", 4);
-    Matrix<double> mat = Matrix<double>();
-    mat.print("Mat");
+
     return 0;
 }
