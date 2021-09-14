@@ -13,7 +13,6 @@ Matrix<T>::Matrix() {
 
 template <typename T>
 Matrix<T>::Matrix(int Rows, int Cols, T* data){
-    cout << "Special constructor called.\n";
     rows = Rows;
     cols = Cols;
     mat = new T*[rows];
@@ -32,7 +31,7 @@ Matrix<T>::Matrix(int Rows, int Cols, T* data){
         }
     }
 
-    this->print("Special matrix");
+//    this->print("Special matrix");
 }
 
 //constructor

@@ -48,19 +48,18 @@ void testMatrixFunctions(){
 }
 
 int main() {
+    Color c = Color();
+
     int RGB[] = {251, 165, 45};
     Color::rgbtoxyz(RGB);
     cout << RGB[0] << endl;
-
-    int test[9];
-    for (int a = 0; a < 9; a++){
-        test[a] = a + 1;
-    }
 
     cout << Color::linearizeRGB(255) << endl;
     cout << Color::linearizeRGB(41) << endl;
     cout << Color::linearizeRGB(10) << endl;
 
+    Color::rgbtoxyz(RGB);
+    readImage();
 
     return 0;
 }

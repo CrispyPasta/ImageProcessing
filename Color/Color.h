@@ -11,14 +11,12 @@
 
 class Color {
 private:
-    double RGBtoXYZlist[9] = {
-            0.4124, 0.3576, 0.1805,
-            0.2126, 0.7152, 0.0722,
-            0.0193, 0.1192, 0.9505
-    };
-
-    Matrix<double> RGBtoXYZ = Matrix<double>(3, 3, RGBtoXYZlist);
+//    static Matrix<double> RGBtoXYZ;
 public:
+
+
+//    static inline Matrix<double> RGBtoXYZ = Matrix<double>();
+
     Color();
     ~Color();
 
