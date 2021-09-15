@@ -8,6 +8,8 @@
 using namespace std;
 using namespace cv;
 
+bool verbose = false;
+
 void readImage(){
     string image_path = "/home/armandt/Desktop/project2021/ImageProcessing/Images/tiny.jpg";
     Mat snepPicture = imread(image_path, IMREAD_COLOR);
@@ -60,19 +62,20 @@ void testMatrixFunctions(){
 int main() {
     Color c = Color();
 
-    int RGB[] = {251, 165, 45};
-//    Color::rgbtoxyz(RGB);
-    cout << RGB[0] << endl;
+    double rgbList[] = {251, 165, 45};
+    Matrix RGB(3, 1, rgbList);
 
-//    cout << Color::linearizeRGB(255) << endl;
-//    cout << Color::linearizeRGB(41) << endl;
-//    cout << Color::linearizeRGB(10) << endl;
+    RGB.print("RGB");
+    Color::rgbtoxyz(RGB);
+    RGB.print("XYZ");
+    Color::xyztoLab(RGB);
+    RGB.print("LAB");
 
     double RGB2[] = {251, 165, 45};
 
 //    Color::rgbtoxyz(RGB2);
     readImage();
-    testMatrixFunctions();
+//    testMatrixFunctions();
 
     return 0;
 }

@@ -28,6 +28,8 @@ public:
 
     Matrix& operator*(const Matrix& m) const;
 
+//    Matrix& operator*(const double& d) const;
+
     void operator*=(int m) const;
 
     void operator*=(double m) const;

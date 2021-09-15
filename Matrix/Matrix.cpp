@@ -155,6 +155,15 @@ Matrix &Matrix::operator*(const Matrix &m) const {
     }
 }
 
+//Matrix &Matrix::operator*(const double &d) const {
+//    Matrix* result = new Matrix(this->rows, this->cols);
+//    for (int a = 0; a < rows; a++){
+//        for (int b = 0; b < cols; b++){
+//            this->mat[a][b] += d;
+//        }
+//    }
+//}
+
 //multiply matrix by constant value
 void Matrix::operator*=(int m) const {
     for (int a = 0; a < this->rows; a++){

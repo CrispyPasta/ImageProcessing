@@ -22,9 +22,9 @@ public:
 
     static double linearizeRGB(int C);
 
-    static void rgbtoxyz(double* BGR);
+    static void rgbtoxyz(Matrix& BGR);
 
-    static void xyztoLab();
+    static void xyztoLab(Matrix& xyz);
 
     static void rgbtoLab(cv::Mat& image);
 };
