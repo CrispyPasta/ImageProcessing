@@ -5,18 +5,18 @@
 #ifndef IMAGEPROCESSING_MATRIX_H
 #define IMAGEPROCESSING_MATRIX_H
 
-template <typename T = double>      //default data type is double
+
 class Matrix {
 public:
     int rows;
     int cols;
-    T** mat;
+    double** mat;
 
     Matrix();
 
-    Matrix(int Rows, int Cols, T* data);
+    Matrix(int Rows, int Cols, double* data);
 
-    Matrix(int Rows, int Cols, T i = 0.0);
+    Matrix(int Rows, int Cols, double i = 0.0);
 
     Matrix(const Matrix& copy);
 
@@ -24,13 +24,13 @@ public:
 
     Matrix& operator+(const Matrix& m);
 
-    Matrix& operator-(const Matrix& m);
+    Matrix& operator-(const Matrix& m) const;
 
-    Matrix& operator*(const Matrix& m);
+    Matrix& operator*(const Matrix& m) const;
 
-    void operator*=(int m);
+    void operator*=(int m) const;
 
-    void operator*=(double m);
+    void operator*=(double m) const;
 
     void operator=(const Matrix& m);
 

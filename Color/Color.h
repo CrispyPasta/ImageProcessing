@@ -22,7 +22,7 @@ public:
 
     static double linearizeRGB(int C);
 
-    static void rgbtoxyz(int* BGR);
+    static void rgbtoxyz(double* BGR);
 
     static void xyztoLab();
 

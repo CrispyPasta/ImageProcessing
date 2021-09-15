@@ -13,7 +13,7 @@ double RGBtoXYZlist[9] = {
         0.0193, 0.1192, 0.9505
 };
 
-Matrix<double> RGBtoXYZ = Matrix<double>(3, 3, RGBtoXYZlist);
+Matrix RGBtoXYZ = Matrix(3, 3, RGBtoXYZlist);
 
 Color::Color() {
 //    Color::RGBtoXYZ = new Matrix<double>(3, 3, Color::RGBtoXYZlist);
@@ -23,14 +23,16 @@ Color::Color() {
  * Converts a three-element RGB array to a three-element double array of the equivalent XYZ values.
  * @param RGB : An integer array of length 3.
  */
-void Color::rgbtoxyz(int* RGB) {
+void Color::rgbtoxyz(double* RGB) {
     cout << "Converting from RGB to XYZ\n";
     cout << "R = " << RGB[0] << '\t';
     cout << "G = " << RGB[1] << '\t';
     cout << "B = " << RGB[2] << '\n';
 
-    Matrix<int> RGBmat = Matrix<int>(3, 1, RGB);
-    RGBtoXYZ.print("its working??");
+    Matrix RGBmat = Matrix(3, 1, RGB);
+    Matrix result = Matrix(3, 1);
+//    result = RGBtoXYZ * RGBmat;
+//    result.print("RGB matrix multiplied with the conversion matrix");
 }
 
 void Color::xyztoLab() {
