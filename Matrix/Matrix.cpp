@@ -28,8 +28,25 @@ Matrix::Matrix(int Rows, int Cols, double* data){
             }
         }
     }
+}
+Matrix::Matrix(int Rows, int Cols, int* data){
+    rows = Rows;
+    cols = Cols;
+    mat = new double*[rows];
+    for (int a = 0; a < rows; a++){
+        mat[a] = new double[cols];
+    } //don't doubt this my boy
 
-//    this->print("Special matrix");
+    int i = 0;  //counter to iterate through the data
+    for (int a = 0; a < Rows; a++){
+        for (int b = 0; b < Cols; b++){
+            if (i >= Rows * Cols){
+                mat[a][b] = 0;
+            } else {
+                mat[a][b] = data[i++];
+            }
+        }
+    }
 }
 
 //constructor

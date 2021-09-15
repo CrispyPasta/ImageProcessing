@@ -16,6 +16,8 @@ public:
 
     Matrix(int Rows, int Cols, double* data);
 
+    Matrix(int Rows, int Cols, int* data);
+
     Matrix(int Rows, int Cols, double i = 0.0);
 
     Matrix(const Matrix& copy);

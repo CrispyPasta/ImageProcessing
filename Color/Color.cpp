@@ -7,6 +7,21 @@
 using namespace std;
 using namespace cv;
 
+//* * * * * * * * * CLASSIFICATION COLORS * * * * * * * * *
+double red[3] = {48.97, 73.36, 58.26};
+double blue[3] = {30.17, 70.96, -98.40};
+
+auto Blue = Matrix(3, 1, blue);
+auto Red = Matrix(3, 1, red);
+
+Matrix classificationColors[] = {Blue, Red};
+
+string colorNames[] = {"Blue", "Red"};
+int numClassificationColors = 2;
+//* * * * * * * * * CLASSIFICATION COLORS * * * * * * * * *
+
+
+//RGB to XYZ conversion matrix
 double RGBtoXYZlist[9] = {
         0.4124564, 0.3575761, 0.1804375,
         0.2126729, 0.7151522, 0.0721750,
@@ -19,7 +34,7 @@ double Yn = 100.0000;
 double Zn = 108.8840;
 
 //gamma value for XYZ to LAB function
-double g = 0.2068965517;        // = 6/29
+//double g = 0.2068965517;        // = 6/29
 double g2 = 0.1284185493;       // = pow(6/29, 2) * 3
 double g3 = 0.008856451679;     // = pow(6/29, 3)
 
@@ -27,35 +42,40 @@ Matrix RGBtoXYZ = Matrix(3, 3, RGBtoXYZlist);
 
 extern bool verbose;
 
+/**
+ * The constructor of the Colors class should be called once in order to instantiate the classificationColors
+ * array
+ */
 Color::Color() {
 }
 
 /**
  * Converts a three-element RGB array to a three-element double array of the equivalent XYZ values.
  * The given RGB vector will have its values overwritten with the equivalent XYZ values.
- * @param RGB : An integer array of length 3.
+ * @param BGR : An integer array of length 3.
  */
-void Color::rgbtoxyz(Matrix& RGB) {
+void Color::rgbtoXyz(Matrix& BGR) {
     if (verbose){
         cout << "Converting from RGB to XYZ\n";
-        cout << "R = " << RGB.mat[0][0] << '\t';
-        cout << "G = " << RGB.mat[1][0] << '\t';
-        cout << "B = " << RGB.mat[2][0] << '\n';
+        cout << "R = " << BGR.mat[0][0] << '\t';
+        cout << "G = " << BGR.mat[1][0] << '\t';
+        cout << "B = " << BGR.mat[2][0] << '\n';
     }
     
     //linearize the RGB values
-    RGB.mat[0][0] = linearizeRGB(RGB.mat[0][0]);
-    RGB.mat[1][0] = linearizeRGB(RGB.mat[1][0]);
-    RGB.mat[2][0] = linearizeRGB(RGB.mat[2][0]);
+    BGR.mat[0][0] = linearizeRGB(BGR.mat[0][0]);
+    BGR.mat[1][0] = linearizeRGB(BGR.mat[1][0]);
+    BGR.mat[2][0] = linearizeRGB(BGR.mat[2][0]);
 
-    RGB.print("Linearized");
+    if(verbose)
+        BGR.print("Linearized");
+
     //then do matrix multiplication
-    RGB = RGBtoXYZ * RGB;
-    RGB *= 100;251
+    BGR = RGBtoXYZ * BGR;
+    BGR *= 100;
 
-    if (verbose){
-        RGB.print("RGB to XYZ");
-    }
+    if (verbose)
+        BGR.print("RGB to XYZ");
     //this function definitely works (math-wise)
 }
 
@@ -107,8 +127,23 @@ void Color::xyztoLab(Matrix& xyz) {
     }
 }
 
-void Color::rgbtoLab(Mat &image) {
+/**
+ * This function will take an RGB array (int) and convert it to L*a*b* values. It will create a matrix object and
+ * update it until it is L*a*b*. Will decide whether it is desirable to return a matrix or an array later.
+ * @param vector : A 3-element integer array containing the RGB value in the order B-G-R.
+ */
+Matrix* Color::rgbtoLab(int* vector) {
     cout << "Converting from RGB to L*a*b*\n";
+
+    int temp = vector[0];           //to reverse the order, just swap the first and last elements of the array
+    vector[0] = vector[2];
+    vector[2] = temp;
+
+    Matrix* lab = new Matrix(3,1, vector);
+    rgbtoXyz(*lab);
+    xyztoLab(*lab);
+    lab->print("Done");
+    return lab;
 }
 
 /**
@@ -127,6 +162,39 @@ double Color::linearizeRGB(int C) {
     }
 
     return Clinear;
+}
+
+/**
+ * Calculates the delta E value between two Lab colors and returns it as a double.
+ * @param val1 : The first Lab value
+ * @param val2 : The second Lab value
+ * @return The delta E between val1 and val2
+ */
+double Color::deltaE(Matrix &val1, Matrix &val2) {
+    double Ldif = val1.mat[0][0] - val2.mat[0][0];
+    double adif = val1.mat[1][0] - val2.mat[1][0];
+    double bdif = val1.mat[2][0] - val2.mat[2][0];
+    return sqrt((Ldif * Ldif) + (adif * adif) + (bdif * bdif));
+}
+
+string Color::classifyColor(Matrix &val) {
+    double minDelta = INFINITY;     //set as biggest possible value
+    int minPos = -1;
+    double tmpDelta;
+
+    for (int i = 0; i < numClassificationColors; i++){
+        tmpDelta = deltaE(val, classificationColors[i]);
+        if (tmpDelta < minDelta){
+            minDelta = tmpDelta;
+            minPos = i;
+        }
+    }
+    verbose = true;
+    if (verbose) {
+        cout << "The minimum delta E value was: " << to_string(minDelta) << endl;
+        cout << "The name of the closest match: " << colorNames[minPos] << endl;
+    }
+    return colorNames[minPos];
 }
 
 Color::~Color() {

@@ -59,23 +59,28 @@ void testMatrixFunctions(){
     }
 }
 
-int main() {
-    Color c = Color();
-
-    double rgbList[] = {251, 165, 45};
+void testColorConversion(){
+    double rgbList[] = {31, 49, 242};
     Matrix RGB(3, 1, rgbList);
 
     RGB.print("RGB");
-    Color::rgbtoxyz(RGB);
+    Color::rgbtoXyz(RGB);
     RGB.print("XYZ");
     Color::xyztoLab(RGB);
     RGB.print("LAB");
 
-    double RGB2[] = {251, 165, 45};
+    int BGR2[] = {242, 85, 17};
+    Matrix* RGB2matrix = Color::rgbtoLab(BGR2);
 
-//    Color::rgbtoxyz(RGB2);
-    readImage();
+    double difference = Color::deltaE(RGB, *RGB2matrix);
+    cout << "Delta E = " << to_string(difference) << endl;
+
+    Color::classifyColor(*RGB2matrix);
+}
+
+int main() {
+//    readImage();
 //    testMatrixFunctions();
-
+    testColorConversion();
     return 0;
 }
