@@ -5,6 +5,8 @@
 #ifndef IMAGEPROCESSING_MATRIX_H
 #define IMAGEPROCESSING_MATRIX_H
 
+#include <string>
+
 
 class Matrix {
 public:

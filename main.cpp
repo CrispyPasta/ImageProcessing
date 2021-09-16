@@ -4,6 +4,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include "Matrix/Matrix.h"
 #include "Color/Color.h"
+#include "Mixing/Mixing.h"
 
 using namespace std;
 using namespace cv;
@@ -19,7 +20,7 @@ void readImage(){
         return;
     }
     cout << "Image loaded!\n";
-//    cout << snepPicture;
+    cout << snepPicture;
 }
 
 void testMatrixFunctions(){
@@ -78,9 +79,40 @@ void testColorConversion(){
     Color::classifyColor(*RGB2matrix);
 }
 
+void testMixingFunctions(){
+    double col1[3] = {100, 100, 100};       //doesn't really matter that the numbers are unrealistic
+    double col2[3] = {75, 75, 75};
+    double col3[3] = {50, 50, 50};
+    double col4[3] = {25, 25, 25};
+    double col5[3] = {0, 0, 0};
+
+    Matrix m1(3, 1, col1);
+    Matrix m2(3, 1, col2);
+    Matrix m3(3, 1, col3);
+    Matrix m4(3, 1, col4);
+    Matrix m5(3, 1, col5);
+
+
+    Matrix unmixedPixels[4] = {m1, m1, m5, m5};    //array of Lab pixel values
+    Matrix mixedPixels[4] = {m1, m1, m5, m5};
+
+    Matrix ave = *(Mixing::averageLab(unmixedPixels, 4));
+    ave.print("Average L*a*b* value", 4);
+
+    double standardDeviation = Mixing::standardDeviation(unmixedPixels, 4);
+    cout << "Standard deviation (unmixed) = " <<  to_string(standardDeviation) << endl;   //for unmixed stuff
+
+    standardDeviation = Mixing::standardDeviation(mixedPixels, 4);
+    cout << "Standard deviation (mixed) = " <<  to_string(standardDeviation) << endl;   //for mixed stuff
+
+    double RMI = Mixing::quantifyMixing(mixedPixels, 4, unmixedPixels, 4);
+    cout << "RMI for the pixels = " << to_string(RMI) << endl;
+}
+
 int main() {
 //    readImage();
 //    testMatrixFunctions();
-    testColorConversion();
+//    testColorConversion();
+    testMixingFunctions();
     return 0;
 }

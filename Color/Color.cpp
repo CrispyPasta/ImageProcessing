@@ -4,6 +4,7 @@
 
 #include "Color.h"
 #include <iostream>
+#include <math.h>
 using namespace std;
 using namespace cv;
 
@@ -189,7 +190,7 @@ string Color::classifyColor(Matrix &val) {
             minPos = i;
         }
     }
-    verbose = true;
+
     if (verbose) {
         cout << "The minimum delta E value was: " << to_string(minDelta) << endl;
         cout << "The name of the closest match: " << colorNames[minPos] << endl;

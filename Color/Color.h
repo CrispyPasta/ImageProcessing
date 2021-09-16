@@ -4,8 +4,9 @@
 #ifndef IMAGEPROCESSING_COLOR_H
 #define IMAGEPROCESSING_COLOR_H
 
-#include <opencv2/opencv.hpp>
 #include "../Matrix/Matrix.h"
+#include <string>
+#include <opencv2/opencv.hpp>
 
 class Color {
 public:
