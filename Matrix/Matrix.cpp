@@ -77,8 +77,13 @@ Matrix::Matrix(const Matrix &copy) {
     }
 }
 
-//convolution operator where M1 is the Kernel and M2 is the image
-//returns one value because convolution returns a scalar value and not another matrix
+
+/**
+ * Convolution operator where M1 is the Kernel and M2 is the image
+ * @param m1 : The kernel (e.g. the gaussian matrix)
+ * @param m2 : The image
+ * @return Double (result of convolution)
+ */
 double Matrix::convolve(Matrix &m1, Matrix &m2) {
     if ((m1.rows != m1.cols) || (m2.rows != m2.cols)){
         string error = "* * * * * * * ERROR * * * * * * *\n";
@@ -103,6 +108,39 @@ double Matrix::convolve(Matrix &m1, Matrix &m2) {
             result += m1.mat[m - i - 1][n - j - 1] * m2.mat[i][j];
         }
     }
+
+    return result;
+}
+
+/**
+ * Calculates convolution where M1 is the kernel and M2 is the image, where the image matrix is larger than
+ * the kernel. A subset of the image will be used to calculate the convolution. The result will be stored in
+ * the Output matrix
+ * @param m1 : The Kernel matrix (e.g. the gaussian)
+ * @param r : The row of the cell where the subset of the image begins.
+ * @param c : The col of the cell where the subset of the image begins.
+ * @param m2 : The image matrix
+ * @param out : The output matrix where the result of the convolution will be stored.
+ * @return Double result of the calculation.
+ */
+double Matrix::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out) {
+    if (!(m2.cols > m1.cols) || !(m2.rows > m1.rows)){
+        string error = "* * * * * * * ERROR * * * * * * *\n";
+        error += "The image matrix must be larger than the kernel.\n";
+        throw error;
+    }
+
+    double result = 0.0;
+    int m = m1.rows;
+    int n = m;  //if the matrices have equal dimensions, then gaussianMatrix = n
+
+    for (int i = 0; i < m; i++){
+        for (int j = 0; j < n; j++){
+            result += m1.mat[m - i - 1][n - j - 1] * m2.mat[r + i][c + j];
+        }
+    }
+
+    out.mat[r][c] = result;
 
     return result;
 }
@@ -172,13 +210,6 @@ Matrix &Matrix::operator*(const Matrix &m) const {
     }
 }
 
-//Matrix &Matrix::operator*(const double &d) const {
-//    Matrix* result = new Matrix(this->rows, this->cols);
-//    for (int a = 0; a < rows; a++){
-//        for (int b = 0; b < cols; b++){
-//            this->mat[a][b] += d;
-//        }
-//    }
 //}
 
 //multiply matrix by constant value
@@ -244,13 +275,6 @@ void Matrix::print(const string& caption, int width, int precision) const{
         }
         cout << " |" << endl;
     }
-}
-
-Matrix::~Matrix() {
-    for (int a = 0; a < rows; a++){
-        delete mat[a];
-    }
-    delete mat;
 }
 
 /**
@@ -340,7 +364,7 @@ void Matrix::extendCorner(Matrix &image, int r, int c, int i, char dir) {
     }
 }
 
-void Matrix::extendMatrix(int i) {
+void Matrix::expandMatrix(int i) {
     int newSize = rows + i * 2;
     Matrix* biggerMatrix = new Matrix(newSize, newSize);  //instantiate new matrix
 
@@ -371,3 +395,11 @@ void Matrix::extendMatrix(int i) {
     delete this->mat;
     this->mat = biggerMatrix->mat;
 }
+
+Matrix::~Matrix() {
+    for (int a = 0; a < rows; a++){
+        delete mat[a];
+    }
+    delete mat;
+}
+

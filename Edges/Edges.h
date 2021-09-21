@@ -18,12 +18,11 @@ public:
 
     Edges(int s);
 
-    void print(std::string caption, int s = 5);
+    void generateGaussian(double sig = 1.4142135624);
 
     void gaussianBlur(Matrix& image);
 
-
-    void generateGaussian(double sig);
+    void print(std::string caption, int s = 5);
 
 };
 

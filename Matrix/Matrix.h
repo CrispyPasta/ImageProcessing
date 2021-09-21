@@ -13,6 +13,7 @@ private:
     void extendLine(Matrix& image, int r, int c, int i, char dir);
 
     void extendCorner(Matrix& image, int r, int c, int i, char dir);
+
 public:
     int rows;
     int cols;
@@ -29,6 +30,8 @@ public:
     Matrix(const Matrix& copy);
 
     static double convolve(Matrix& m1, Matrix& m2);
+
+    static double convolve(Matrix& m1, int r, int c, Matrix& m2, Matrix& out);
 
     Matrix& operator+(const Matrix& m);
 
@@ -48,7 +51,7 @@ public:
 
     void operator=(double i);
 
-    void extendMatrix(int i);
+    void expandMatrix(int i);
 
     void print(const std::string& caption = "", int width = 7, int precision = 3) const;
 

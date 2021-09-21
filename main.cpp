@@ -118,8 +118,23 @@ void testEdgeDetection(){
 
     e.print("After", 5);
 
-    e.gaussianMatrix.extendMatrix(2);
+    e.gaussianMatrix.expandMatrix(2);
     e.gaussianMatrix.print("Expanded matrix", 5, 2);
+
+    Matrix image(15, 15, 1);
+    Matrix kernel(3, 3, 2);
+    Matrix blurredImage(15, 15);
+
+    double d = Matrix::convolve(kernel, 0, 0, image, blurredImage);
+    cout << d << endl;
+
+    Edges f(5);
+    f.generateGaussian(sqrt(2));
+    Matrix gaussianStandIn(5, 5, 1);
+
+    f.gaussianBlur(image);
+    image.print("Blurred?");
+
 }
 
 int main() {
