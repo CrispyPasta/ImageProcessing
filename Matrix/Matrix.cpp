@@ -96,7 +96,7 @@ double Matrix::convolve(Matrix &m1, Matrix &m2) {
 
     double result = 0.0;
     int m = m1.rows;
-    int n = m;  //if the matrices have equal dimensions, then m = n
+    int n = m;  //if the matrices have equal dimensions, then gaussianMatrix = n
 
     for (int i = 0; i < m; i++){
         for (int j = 0; j < n; j++){
@@ -234,13 +234,13 @@ void Matrix::operator=(const double d) {
     }
 }
 
-void Matrix::print(const string& caption, int width) const{
+void Matrix::print(const string& caption, int width, int precision) const{
     cout << caption << endl;
     for (int a = 0; a < rows; a++){
         cout << left;
         cout << "| ";
         for (int b = 0; b < cols; b++){
-            cout << setw(width) << to_string(mat[a][b]) << " ";
+            cout << setw(width) << fixed << setprecision(precision) << mat[a][b] << " ";
         }
         cout << " |" << endl;
     }
@@ -251,4 +251,123 @@ Matrix::~Matrix() {
         delete mat[a];
     }
     delete mat;
+}
+
+/**
+ * Takes a matrix and extends the pixels around it using the given position. This function will extend the pixels in
+ * a line-fashion (i.e. this doesn't do corners). This is just done separately for readability.
+ * @param image : The matrix that is getting expanded.
+ * @param r : The row of the pixel who's value must be copied.
+ * @param c : The col of the pixel who's value must be copied.
+ * @param i : The number of cells by which the matrix is being expanded.
+ * @param dir : The direction in which the expansion should take place. u = up, d = down, r = right and l = left
+ */
+void Matrix::extendLine(Matrix& image, int r, int c, int i, char dir){
+    switch (dir) {
+        case 'u':
+            for (int a = 0; a < i; a++){                //a refers to rows changing
+                image.mat[a][c] = image.mat[r][c];
+            }
+            break;
+
+        case 'd':
+            for (int a = r + 1; a < r + i + 1; a++){    //a refers to rows changing
+                image.mat[a][c] = image.mat[r][c];
+            }
+            break;
+
+        case 'l':
+            for (int a = 0; a < i; a++){                //a refers to cols changing
+                image.mat[r][a] = image.mat[r][c];
+            }
+            break;
+
+        case 'r':
+            for (int a = c + 1; a < c + i + 1; a++){                //a refers to cols changing
+                image.mat[r][a] = image.mat[r][c];
+            }
+            break;
+
+        default:
+            string e = "Invalid direction specified.\n";
+            throw e;
+    }
+}
+
+/**
+ * Takes a matrix and extends the pixels around it using the given position. This function will extend the pixels in
+ * a corner-fashion (i.e. this doesn't do the lines). This is just done separately for readability.
+ * @param image : The matrix that is getting expanded.
+ * @param r : The row of the pixel who's value must be copied.
+ * @param c : The col of the pixel who's value must be copied.
+ * @param i : The number of cells by which the matrix is being expanded.
+ * @param dir : The direction in which the expansion should take place.
+ * a = left top, b = right top, c = left bottom and d = right bottom
+ */
+void Matrix::extendCorner(Matrix &image, int r, int c, int i, char dir) {
+    int originRow = 0;
+    int originCol = 0;
+    switch (dir) {
+        case 'a':
+            originRow = 0;
+            originCol = 0;
+            break;
+
+        case 'b':
+            originRow = 0;
+            originCol = c + 1;
+            break;
+
+        case 'c':
+            originRow = r + 1;
+            originCol = 0;
+            break;
+
+        case 'd':
+            originRow = r + 1;
+            originCol = c + 1;
+            break;
+
+        default:
+            string e = "Invalid direction specified.\n";
+            throw e;
+    }
+
+    for (int a = originRow; a < originRow + i; a++){
+        for (int b = originCol; b < originCol + i; b++){
+            image.mat[a][b] = image.mat[r][c];
+        }
+    }
+}
+
+void Matrix::extendMatrix(int i) {
+    int newSize = rows + i * 2;
+    Matrix* biggerMatrix = new Matrix(newSize, newSize);  //instantiate new matrix
+
+    int backEdge = newSize - i - 1;
+
+    for (int a = i; a < rows + i; a++){     //fill in the middle of the matrix
+        for (int b = i; b < cols + i; b++){
+            biggerMatrix->mat[a][b] = mat[a - i][b - i];
+        }
+    }
+
+    for (int a = i; a < backEdge + 1; a++){ //extend in lines
+        Matrix::extendLine(*biggerMatrix, i, a, i, 'u');
+        Matrix::extendLine(*biggerMatrix, backEdge, a, i, 'd');
+        Matrix::extendLine(*biggerMatrix, a, i, i, 'l');
+        Matrix::extendLine(*biggerMatrix, a, backEdge, i, 'r');
+    }
+
+    Matrix::extendCorner(*biggerMatrix, i, i, i, 'a');  //extend the corners
+    Matrix::extendCorner(*biggerMatrix, i, backEdge, i, 'b');
+    Matrix::extendCorner(*biggerMatrix, backEdge, i, i, 'c');
+    Matrix::extendCorner(*biggerMatrix, backEdge, backEdge, i, 'd');
+
+//    biggerMatrix->print("Expanded matrix", 6, 2);
+
+    this->rows = biggerMatrix->rows;
+    this->cols = biggerMatrix->cols;
+    delete this->mat;
+    this->mat = biggerMatrix->mat;
 }

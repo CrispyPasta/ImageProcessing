@@ -5,6 +5,7 @@
 #include "Matrix/Matrix.h"
 #include "Color/Color.h"
 #include "Mixing/Mixing.h"
+#include "Edges/Edges.h"
 
 using namespace std;
 using namespace cv;
@@ -28,8 +29,8 @@ void testMatrixFunctions(){
 
     Matrix m1(3, 3, -1);
     Matrix m2(3, 1, 7);
-    m1.print("M1", 4);
-    m2.print("M2", 4);
+    m1.print("M1", 5);
+    m2.print("M2", 5);
 
     Matrix copied = m2;
     copied.print("Copied from m2");
@@ -47,7 +48,7 @@ void testMatrixFunctions(){
 
     try{
         Matrix m4 = kernel * image2;
-        m4.print("M4 = kernel * image2");
+        m4.print("M4 = kernel * image2 ");
     } catch (string & s){
         cout << s << endl;
     }
@@ -97,7 +98,7 @@ void testMixingFunctions(){
     Matrix mixedPixels[4] = {m1, m1, m5, m5};
 
     Matrix ave = *(Mixing::averageLab(unmixedPixels, 4));
-    ave.print("Average L*a*b* value", 4);
+    ave.print("Average L*a*b* value", 3);
 
     double standardDeviation = Mixing::standardDeviation(unmixedPixels, 4);
     cout << "Standard deviation (unmixed) = " <<  to_string(standardDeviation) << endl;   //for unmixed stuff
@@ -109,10 +110,23 @@ void testMixingFunctions(){
     cout << "RMI for the pixels = " << to_string(RMI) << endl;
 }
 
+void testEdgeDetection(){
+    Edges e(7);
+    e.print("Before");
+
+    e.generateGaussian(sqrt(2));
+
+    e.print("After", 5);
+
+    e.gaussianMatrix.extendMatrix(2);
+    e.gaussianMatrix.print("Expanded matrix", 5, 2);
+}
+
 int main() {
 //    readImage();
 //    testMatrixFunctions();
 //    testColorConversion();
-    testMixingFunctions();
+//    testMixingFunctions();
+    testEdgeDetection();
     return 0;
 }

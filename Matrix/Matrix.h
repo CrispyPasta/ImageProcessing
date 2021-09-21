@@ -9,6 +9,10 @@
 
 
 class Matrix {
+private:
+    void extendLine(Matrix& image, int r, int c, int i, char dir);
+
+    void extendCorner(Matrix& image, int r, int c, int i, char dir);
 public:
     int rows;
     int cols;
@@ -44,7 +48,9 @@ public:
 
     void operator=(double i);
 
-    void print(const std::string& caption = "", int width = 7) const;
+    void extendMatrix(int i);
+
+    void print(const std::string& caption = "", int width = 7, int precision = 3) const;
 
     ~Matrix();
 };
