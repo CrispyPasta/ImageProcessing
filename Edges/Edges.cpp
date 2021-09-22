@@ -21,6 +21,9 @@ Edges::Edges() {
  * @param s : The literal size of the matrix. It will be (s x s)-sized. K will be set to (s / 2) - 1
  */
 Edges::Edges(int s) {
+    if (s % 2 != 1){
+        cout << "The size of the kernel should be an odd number.\n";
+    }
     size = s;
     k = (s - 1) / 2;
     //matrix is an array of pointers
@@ -75,6 +78,38 @@ void Edges::gaussianBlur(Matrix &image) {
     image.cols = blurredImage->cols;
     delete image.mat;
     image.mat = blurredImage->mat;
+}
+
+/**
+ * Returns an image containing only the desired color channel's data. i determines which channel is returned.
+ * @param image : The image (opencv:mat object)
+ * @param i : 2 for red, 1 for green and 0 for blue
+ * @return : Matrix* a new image object that has only the desired color data in it.
+ */
+Matrix* Edges::getChannel(Mat &image, int i) {
+    Matrix* imageChannel = new Matrix(image.rows, image.cols);
+    Vec3b intensity;
+
+    for (int a = 0; a < imageChannel->rows; a++){
+        for (int b = 0; b < imageChannel->cols; b++){
+            intensity = image.at<Vec3b>(a, b);
+            imageChannel->mat[a][b] = intensity.val[i];
+        }
+    }
+
+    return imageChannel;
+}
+
+Matrix* Edges::getRed(Mat &image) {
+    return getChannel(image, 2);
+}
+
+Matrix* Edges::getGreen(Mat &image) {
+    return getChannel(image, 1);
+}
+
+Matrix* Edges::getBlue(Mat &image) {
+    return getChannel(image, 0);
 }
 
 /**
