@@ -52,6 +52,7 @@ void Edges::generateGaussian(double sig) {
         for (int j = 1; j <= (2*k + 1); j++){
             b = pow(j - (k + 1), 2);    //dont doubt the intervals or the values for a and b, they make sense.
             gaussianMatrix.mat[i - 1][j - 1] = round(norm * exp(-((a + b) / d)));
+            gaussianTotal += round(norm * exp(-((a + b) / d)));
 //            gaussianMatrix.mat[i - 1][j - 1] = norm * exp(-((a + b) / d));
         }
     }
@@ -70,7 +71,7 @@ void Edges::gaussianBlur(Matrix &image) {
     double d;
     for (int a = 0; a < rows; a++){
         for (int b = 0; b < cols; b++){
-            Matrix::convolve(gaussianMatrix, a, b, image, *blurredImage);
+            Matrix::convolve(gaussianMatrix, a, b, image, *blurredImage, gaussianTotal);
         }
     }
 

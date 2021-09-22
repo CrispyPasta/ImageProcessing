@@ -19,6 +19,7 @@ public:
     double sigma;
     int size;
     int k;
+    double gaussianTotal;
     Matrix gaussianMatrix;
 
     Edges();

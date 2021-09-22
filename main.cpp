@@ -28,6 +28,18 @@ void readImage(){
         Matrix* blueImage = Edges::getBlue(snepPicture);
         Matrix* greenImage = Edges::getGreen(snepPicture);
         redImage->print("Red values", 4, 1);
+
+        cout << "Original rows: " << redImage->rows << endl;
+        cout << "Original cols: " << redImage->cols << endl;
+        redImage->expandMatrix(3);
+        redImage->print("Expanded Red-channel image");
+        cout << "Expanded rows: " << redImage->rows << endl;
+        cout << "Expanded cols: " << redImage->cols << endl;
+
+        Edges f(5);
+        f.generateGaussian(sqrt(2));
+        f.gaussianBlur(*redImage);
+        redImage->print("Blurred image:");
     } catch (string& e) {
         cout << e;
     }
@@ -78,7 +90,7 @@ void testColorConversion(){
         double difference = Color::deltaE(RGB, *RGB2matrix);
         cout << "Delta E = " << to_string(difference) << endl;
 
-        Color::classifyColor(*RGB2matrix);
+        cout << Color::classifyColor(*RGB2matrix);
     } catch (string& e) {
         cout << e;
     }
@@ -100,7 +112,7 @@ void testMixingFunctions(){
 
 
         Matrix unmixedPixels[4] = {m1, m1, m5, m5};    //array of Lab pixel values
-        Matrix mixedPixels[4] = {m1, m1, m5, m5};
+        Matrix mixedPixels[4] = {m1, m2, m3, m4};
 
         Matrix ave = *(Mixing::averageLab(unmixedPixels, 4));
         ave.print("Average L*a*b* value", 3);
@@ -134,7 +146,7 @@ void testEdgeDetection(){
         Matrix kernel(3, 3, 2);
         Matrix blurredImage(15, 15);
 
-        double d = Matrix::convolve(kernel, 0, 0, image, blurredImage);
+        double d = Matrix::convolve(kernel, 0, 0, image, blurredImage, 1);
         cout << d << endl;
 
         Edges f(5);
@@ -142,7 +154,7 @@ void testEdgeDetection(){
         Matrix gaussianStandIn(5, 5, 1);
 
         f.gaussianBlur(image);
-        image.print("Blurred?");
+        image.print("Blurred:");
     } catch (string& e){
         cout << e;
     }

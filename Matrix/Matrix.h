@@ -31,7 +31,7 @@ public:
 
     static double convolve(Matrix& m1, Matrix& m2);
 
-    static double convolve(Matrix& m1, int r, int c, Matrix& m2, Matrix& out);
+    static double convolve(Matrix& m1, int r, int c, Matrix& m2, Matrix& out, double t);
 
     Matrix& operator+(const Matrix& m);
 

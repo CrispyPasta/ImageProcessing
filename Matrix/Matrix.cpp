@@ -123,7 +123,7 @@ double Matrix::convolve(Matrix &m1, Matrix &m2) {
  * @param out : The output matrix where the result of the convolution will be stored.
  * @return Double result of the calculation.
  */
-double Matrix::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out) {
+double Matrix::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out, double t) {
     if (!(m2.cols > m1.cols) || !(m2.rows > m1.rows)){
         string error = "* * * * * * * ERROR * * * * * * *\n";
         error += "The image matrix must be larger than the kernel.\n";
@@ -140,9 +140,9 @@ double Matrix::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out) {
         }
     }
 
-    out.mat[r][c] = result;
+    out.mat[r][c] = result / t;
 
-    return result;
+    return result / t;
 }
 
 Matrix& Matrix::operator+(const Matrix &m) {
@@ -366,7 +366,8 @@ void Matrix::extendCorner(Matrix &image, int r, int c, int i, char dir) {
 
 void Matrix::expandMatrix(int i) {
     int newSize = rows + i * 2;
-    Matrix* biggerMatrix = new Matrix(newSize, newSize);  //instantiate new matrix
+    int newColsSize = cols + i * 2;
+    Matrix* biggerMatrix = new Matrix(newSize, newColsSize);  //instantiate new matrix
 
     int backEdge = newSize - i - 1;
 
