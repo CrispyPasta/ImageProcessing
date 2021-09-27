@@ -23,6 +23,7 @@ void readImage(){
         }
         cout << "Image loaded!\n";
         cout << snepPicture << "\n\n";
+//        imwrite("/home/armandt/Desktop/project2021/ImageProcessing/Images/red.jpg", snepPicture);
 
         Matrix* redImage = Edges::getRed(snepPicture);
         Matrix* blueImage = Edges::getBlue(snepPicture);
@@ -32,7 +33,7 @@ void readImage(){
         cout << "Original rows: " << redImage->rows << endl;
         cout << "Original cols: " << redImage->cols << endl;
         redImage->expandMatrix(3);
-        redImage->print("Expanded Red-channel image");
+        redImage->print("Expanded Red-channel image.");
         cout << "Expanded rows: " << redImage->rows << endl;
         cout << "Expanded cols: " << redImage->cols << endl;
 
@@ -40,6 +41,15 @@ void readImage(){
         f.generateGaussian(sqrt(2));
         f.gaussianBlur(*redImage);
         redImage->print("Blurred image:");
+
+        double redMatrixArray[redImage->rows * redImage->cols];
+        redImage->toArray(redMatrixArray);
+
+        Mat saveImage(redImage->rows, redImage->cols, CV_8U, redMatrixArray);
+        cout << saveImage;
+        imwrite("/home/armandt/Desktop/project2021/ImageProcessing/Images/red.jpg", saveImage);
+        cout << "\nSuccessful?\n";
+
     } catch (string& e) {
         cout << e;
     }

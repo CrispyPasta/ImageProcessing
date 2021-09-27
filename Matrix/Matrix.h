@@ -55,6 +55,8 @@ public:
 
     void print(const std::string& caption = "", int width = 7, int precision = 3) const;
 
+    void toArray(double* arr);
+
     ~Matrix();
 };
 

@@ -397,6 +397,16 @@ void Matrix::expandMatrix(int i) {
     this->mat = biggerMatrix->mat;
 }
 
+void Matrix::toArray(double* arr) {
+    int i = 0;
+    for (int a = 0; a < rows; a++){
+        for (int b = 0; b < cols; b++){
+            arr[i] = mat[a][b];
+            i++;
+        }
+    }
+}
+
 Matrix::~Matrix() {
     for (int a = 0; a < rows; a++){
         delete mat[a];
