@@ -12,10 +12,10 @@ using namespace cv;
 double red[3] = {48.97, 73.36, 58.26};
 double blue[3] = {30.17, 70.96, -98.40};
 
-auto Blue = Matrix(3, 1, blue);
-auto Red = Matrix(3, 1, red);
+auto Blue = Matrix<double>(3, 1, blue);
+auto Red = Matrix<double>(3, 1, red);
 
-Matrix classificationColors[] = {Blue, Red};
+Matrix<double> classificationColors[] = {Blue, Red};
 
 string colorNames[] = {"Blue", "Red"};
 int numClassificationColors = 2;
@@ -39,7 +39,7 @@ double Zn = 108.8840;
 double g2 = 0.1284185493;       // = pow(6/29, 2) * 3
 double g3 = 0.008856451679;     // = pow(6/29, 3)
 
-Matrix RGBtoXYZ = Matrix(3, 3, RGBtoXYZlist);
+Matrix<double> RGBtoXYZ = Matrix<double>(3, 3, RGBtoXYZlist);
 
 extern bool verbose;
 
@@ -55,7 +55,7 @@ Color::Color() {
  * The given RGB vector will have its values overwritten with the equivalent XYZ values.
  * @param BGR : An integer array of length 3.
  */
-void Color::rgbtoXyz(Matrix& BGR) {
+void Color::rgbtoXyz(Matrix<double>& BGR) {
     if (verbose){
         cout << "Converting from RGB to XYZ\n";
         cout << "R = " << BGR.mat[0][0] << '\t';
@@ -99,7 +99,7 @@ double xyztoLabStub(double t) {
  * will be overwritten.
  * @param xyz : The column vector [X Y Z]T to be converted to LAB.
  */
-void Color::xyztoLab(Matrix& xyz) {
+void Color::xyztoLab(Matrix<double>& xyz) {
     double tmpX = xyz.mat[0][0] / Xn;       //these values will be passed into the conversion function
     double tmpY = xyz.mat[1][0] / Yn;
     double tmpZ = xyz.mat[2][0] / Zn;
@@ -133,14 +133,14 @@ void Color::xyztoLab(Matrix& xyz) {
  * update it until it is L*a*b*. Will decide whether it is desirable to return a matrix or an array later.
  * @param vector : A 3-element integer array containing the RGB value in the order B-G-R.
  */
-Matrix* Color::rgbtoLab(int* vector) {
+Matrix<double>* Color::rgbtoLab(int* vector) {
     cout << "Converting from RGB to L*a*b*\n";
+    double temp[3];
+    temp[0] = vector[2];
+    temp[1] = vector[1];
+    temp[2] = vector[0];
 
-    int temp = vector[0];           //to reverse the order, just swap the first and last elements of the array
-    vector[0] = vector[2];
-    vector[2] = temp;
-
-    Matrix* lab = new Matrix(3,1, vector);
+    auto* lab = new Matrix<double>(3,1, temp);
     rgbtoXyz(*lab);
     xyztoLab(*lab);
     lab->print("Done");
@@ -171,14 +171,14 @@ double Color::linearizeRGB(int C) {
  * @param val2 : The second Lab value
  * @return The delta E between val1 and val2
  */
-double Color::deltaE(Matrix &val1, Matrix &val2) {
+double Color::deltaE(Matrix<double> &val1, Matrix<double> &val2) {
     double Ldif = val1.mat[0][0] - val2.mat[0][0];
     double adif = val1.mat[1][0] - val2.mat[1][0];
     double bdif = val1.mat[2][0] - val2.mat[2][0];
     return sqrt((Ldif * Ldif) + (adif * adif) + (bdif * bdif));
 }
 
-string Color::classifyColor(Matrix &val) {
+string Color::classifyColor(Matrix<double> &val) {
     double minDelta = INFINITY;     //set as biggest possible value
     int minPos = -1;
     double tmpDelta;

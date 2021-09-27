@@ -14,13 +14,13 @@ using namespace cv;
 
 class Edges {
 private:
-    static Matrix* getChannel(Mat& image, int i);
+    static Matrix<uint8_t>* getChannel(Mat& image, int i);
 public:
     double sigma;
     int size;
     int k;
     double gaussianTotal;
-    Matrix gaussianMatrix;
+    Matrix<double> gaussianMatrix;
 
     Edges();
 
@@ -28,13 +28,13 @@ public:
 
     void generateGaussian(double sig = 1.4142135624);
 
-    void gaussianBlur(Matrix& image);
+    void gaussianBlur(Matrix<uint8_t>& image);
 
-    static Matrix* getRed(Mat& image);
+    static Matrix<uint8_t>* getRed(Mat& image);
 
-    static Matrix* getBlue(Mat& image);
+    static Matrix<uint8_t>* getBlue(Mat& image);
 
-    static Matrix* getGreen(Mat& image);
+    static Matrix<uint8_t>* getGreen(Mat& image);
 
     void print(std::string caption, int s = 5);
 

@@ -10,11 +10,11 @@
 class Mixing {
 private:
 public:
-    static Matrix* averageLab(Matrix* pixels, int numPixels);
+    static Matrix<double>* averageLab(Matrix<double>* pixels, int numPixels);
 
-    static double standardDeviation(Matrix* pixels, int numPixels);
+    static double standardDeviation(Matrix<double>* pixels, int numPixels);
 
-    static double quantifyMixing(Matrix* mixedPixels, int N, Matrix* unmixedPixels, int M);
+    static double quantifyMixing(Matrix<double>* mixedPixels, int N, Matrix<double>* unmixedPixels, int M);
 };
 
 

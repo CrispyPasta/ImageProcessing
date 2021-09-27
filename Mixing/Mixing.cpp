@@ -12,10 +12,10 @@ using namespace std;
  * @param numPixels : The number of elements in the array
  * @return The standard deviation of the given pixels
  */
-double Mixing::standardDeviation(Matrix *pixels, int numPixels) {
+double Mixing::standardDeviation(Matrix<double> *pixels, int numPixels) {
     double sum = 0;
 
-    Matrix alpha = *averageLab(pixels, numPixels);  //alpha is the average pixel value
+    Matrix<double> alpha = *averageLab(pixels, numPixels);  //alpha is the average pixel value
     double tmp;
 
     for (int a = 0; a < numPixels; a++){
@@ -34,9 +34,9 @@ double Mixing::standardDeviation(Matrix *pixels, int numPixels) {
  * @param numPixels : Number of elements in the array
  * @return : A pixel containing the average values for each channel: L, a, and b
  */
-Matrix* Mixing::averageLab(Matrix *pixels, int numPixels) {
-    Matrix sum(3, 1);
-    Matrix* result = new Matrix(3, 1);
+Matrix<double>* Mixing::averageLab(Matrix<double> *pixels, int numPixels) {
+    Matrix<double> sum(3, 1);
+    auto* result = new Matrix<double>(3, 1);
 
     for (int a = 0; a < numPixels; a++){
         sum.mat[0][0] += pixels[a].mat[0][0];       //sum the L, a and b values
@@ -60,7 +60,7 @@ Matrix* Mixing::averageLab(Matrix *pixels, int numPixels) {
  * @param M : Number of pixels in the unmixedPixels array
  * @return The RMI as a percentage value (0-100)
  */
-double Mixing::quantifyMixing(Matrix* mixedPixels, int N, Matrix* unmixedPixels, int M) {
+double Mixing::quantifyMixing(Matrix<double>* mixedPixels, int N, Matrix<double>* unmixedPixels, int M) {
     double mixedSD = standardDeviation(mixedPixels, N);
     double unmixedSD = standardDeviation(unmixedPixels, M);
 

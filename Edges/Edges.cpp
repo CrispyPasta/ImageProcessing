@@ -13,7 +13,7 @@ using namespace std;
 Edges::Edges() {
     size = 7;
     k = 3;
-    gaussianMatrix = Matrix(size, size);
+    gaussianMatrix = Matrix<double>(size, size);
 }
 
 /**
@@ -27,7 +27,7 @@ Edges::Edges(int s) {
     size = s;
     k = (s - 1) / 2;
     //matrix is an array of pointers
-    gaussianMatrix = Matrix(s, s);
+    gaussianMatrix = Matrix<double>(s, s);
 }
 
 /**
@@ -62,16 +62,16 @@ void Edges::generateGaussian(double sig) {
  * This function will convolve the input matrix (an image) with the gaussian matrix.
  * @param image : The matrix containing the image we want to blur.
  */
-void Edges::gaussianBlur(Matrix &image) {
+void Edges::gaussianBlur(Matrix<uint8_t> &image) {
     int rows = image.rows;
     int cols = image.cols;
-    Matrix* blurredImage = new Matrix(image.rows, image.cols);
+    Matrix<uint8_t>* blurredImage = new Matrix<uint8_t>(image.rows, image.cols);
     image.expandMatrix(k);      //expand the image
 
     double d;
     for (int a = 0; a < rows; a++){
         for (int b = 0; b < cols; b++){
-            Matrix::convolve(gaussianMatrix, a, b, image, *blurredImage, gaussianTotal);
+            Matrix<uint8_t>::convolve(gaussianMatrix, a, b, image, *blurredImage, gaussianTotal);
         }
     }
 
@@ -87,8 +87,8 @@ void Edges::gaussianBlur(Matrix &image) {
  * @param i : 2 for red, 1 for green and 0 for blue
  * @return : Matrix* a new image object that has only the desired color data in it.
  */
-Matrix* Edges::getChannel(Mat &image, int i) {
-    Matrix* imageChannel = new Matrix(image.rows, image.cols);
+Matrix<uint8_t>* Edges::getChannel(Mat &image, int i) {
+    auto* imageChannel = new Matrix<uint8_t>(image.rows, image.cols);
     Vec3b intensity;
 
     for (int a = 0; a < imageChannel->rows; a++){
@@ -101,15 +101,15 @@ Matrix* Edges::getChannel(Mat &image, int i) {
     return imageChannel;
 }
 
-Matrix* Edges::getRed(Mat &image) {
+Matrix<uint8_t>* Edges::getRed(Mat &image) {
     return getChannel(image, 2);
 }
 
-Matrix* Edges::getGreen(Mat &image) {
+Matrix<uint8_t>* Edges::getGreen(Mat &image) {
     return getChannel(image, 1);
 }
 
-Matrix* Edges::getBlue(Mat &image) {
+Matrix<uint8_t>* Edges::getBlue(Mat &image) {
     return getChannel(image, 0);
 }
 

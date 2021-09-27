@@ -7,7 +7,7 @@
 
 #include <string>
 
-
+template <class T>
 class Matrix {
 private:
     void extendLine(Matrix& image, int r, int c, int i, char dir);
@@ -17,21 +17,23 @@ private:
 public:
     int rows;
     int cols;
-    double** mat;
+    T** mat;
 
     Matrix();
 
-    Matrix(int Rows, int Cols, double* data);
+//    Matrix(int Rows, int Cols, double* data);
 
-    Matrix(int Rows, int Cols, int* data);
+    Matrix(int Rows, int Cols, T* data);
 
-    Matrix(int Rows, int Cols, double i = 0.0);
+    Matrix(int Rows, int Cols, T i = 0.0);
 
     Matrix(const Matrix& copy);
 
     static double convolve(Matrix& m1, Matrix& m2);
 
     static double convolve(Matrix& m1, int r, int c, Matrix& m2, Matrix& out, double t);
+
+    static double convolve(Matrix<double>& m1, int r, int c, Matrix<uint8_t>& m2, Matrix<uint8_t>& out, double t);
 
     Matrix& operator+(const Matrix& m);
 
@@ -55,7 +57,7 @@ public:
 
     void print(const std::string& caption = "", int width = 7, int precision = 3) const;
 
-    void toArray(double* arr);
+    void toArray(T* arr);
 
     ~Matrix();
 };

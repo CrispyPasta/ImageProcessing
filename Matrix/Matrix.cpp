@@ -6,35 +6,39 @@
 #include "Matrix.h"
 using namespace std;
 
-Matrix::Matrix() {
+template<class T>
+Matrix<T>::Matrix() {
     *this = Matrix(3, 3, 0.0);
 }
 
-Matrix::Matrix(int Rows, int Cols, double* data){
-    rows = Rows;
-    cols = Cols;
-    mat = new double*[rows];
-    for (int a = 0; a < rows; a++){
-        mat[a] = new double[cols];
-    } //don't doubt this my boy
+//template<class T>
+//Matrix<T>::Matrix(int Rows, int Cols, double* data){
+//    rows = Rows;
+//    cols = Cols;
+//    mat = new double*[rows];
+//    for (int a = 0; a < rows; a++){
+//        mat[a] = new double[cols];
+//    } //don't doubt this my boy
+//
+//    int i = 0;  //counter to iterate through the data
+//    for (int a = 0; a < Rows; a++){
+//        for (int b = 0; b < Cols; b++){
+//            if (i >= Rows * Cols){
+//                mat[a][b] = 0;
+//            } else {
+//                mat[a][b] = data[i++];
+//            }
+//        }
+//    }
+//}
 
-    int i = 0;  //counter to iterate through the data
-    for (int a = 0; a < Rows; a++){
-        for (int b = 0; b < Cols; b++){
-            if (i >= Rows * Cols){
-                mat[a][b] = 0;
-            } else {
-                mat[a][b] = data[i++];
-            }
-        }
-    }
-}
-Matrix::Matrix(int Rows, int Cols, int* data){
+template<class T>
+Matrix<T>::Matrix(int Rows, int Cols, T *data) {
     rows = Rows;
     cols = Cols;
-    mat = new double*[rows];
+    mat = new T*[rows];
     for (int a = 0; a < rows; a++){
-        mat[a] = new double[cols];
+        mat[a] = new T[cols];
     } //don't doubt this my boy
 
     int i = 0;  //counter to iterate through the data
@@ -50,13 +54,14 @@ Matrix::Matrix(int Rows, int Cols, int* data){
 }
 
 //constructor
-Matrix::Matrix(int r, int c, double i) {
+template<class T>
+Matrix<T>::Matrix(int r, int c, T i) {
     rows = r;
     cols = c;
 
-    mat = new double*[rows];
+    mat = new T*[rows];
     for (int a = 0; a < rows; a++){
-        mat[a] = new double[cols];
+        mat[a] = new T[cols];
     } //don't doubt this my boy
 
     for (int a = 0; a < rows; a++){
@@ -67,7 +72,8 @@ Matrix::Matrix(int r, int c, double i) {
 }
 
 
-Matrix::Matrix(const Matrix &copy) {
+template<class T>
+Matrix<T>::Matrix(const Matrix &copy) {
     *this = Matrix(copy.rows, copy.cols, 0.0);
 
     for (int a = 0; a < rows; a++){
@@ -77,14 +83,14 @@ Matrix::Matrix(const Matrix &copy) {
     }
 }
 
-
 /**
  * Convolution operator where M1 is the Kernel and M2 is the image
  * @param m1 : The kernel (e.g. the gaussian matrix)
  * @param m2 : The image
  * @return Double (result of convolution)
  */
-double Matrix::convolve(Matrix &m1, Matrix &m2) {
+template<class T>
+double Matrix<T>::convolve(Matrix &m1, Matrix &m2) {
     if ((m1.rows != m1.cols) || (m2.rows != m2.cols)){
         string error = "* * * * * * * ERROR * * * * * * *\n";
         error += "One or both of the matrices are asymmetrical.\n";
@@ -123,7 +129,8 @@ double Matrix::convolve(Matrix &m1, Matrix &m2) {
  * @param out : The output matrix where the result of the convolution will be stored.
  * @return Double result of the calculation.
  */
-double Matrix::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out, double t) {
+ template<class T>
+double Matrix<T>::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out, double t) {
     if (!(m2.cols > m1.cols) || !(m2.rows > m1.rows)){
         string error = "* * * * * * * ERROR * * * * * * *\n";
         error += "The image matrix must be larger than the kernel.\n";
@@ -145,7 +152,33 @@ double Matrix::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out, doubl
     return result / t;
 }
 
-Matrix& Matrix::operator+(const Matrix &m) {
+template<class T>
+double Matrix<T>::convolve(Matrix<double>& m1, int r, int c, Matrix<uint8_t>& m2, Matrix<uint8_t>& out, double t) {
+    if (m2.cols <= m1.cols || m2.rows <= m1.rows) {
+        string error = "* * * * * * * ERROR * * * * * * *\n";
+        error += "The image matrix must be larger than the kernel.\n";
+        throw error;
+    }
+
+    double result = 0.0;
+    int m = m1.rows;
+    int n = m;  //if the matrices have equal dimensions, then gaussianMatrix = n
+
+    for (int i = 0; i < m; i++){
+        for (int j = 0; j < n; j++){
+            result += m1.mat[m - i - 1][n - j - 1] * m2.mat[r + i][c + j];
+        }
+    }
+
+    out.mat[r][c] = result / t;
+
+    return result / t;
+}
+
+
+
+template<class T>
+Matrix<T>& Matrix<T>::operator+(const Matrix &m) {
     if ((this->rows != m.rows) || (this->cols != m.cols)){
         string message = "";
         message += "The dimensions of the matrices don't match: ";
@@ -154,7 +187,7 @@ Matrix& Matrix::operator+(const Matrix &m) {
         cout << message;
         throw message;  //stop the program so we don't waste time or destroy data or something
     } else {
-        Matrix* result = new Matrix(m.rows, m.cols);         //this will hold the answer, pass by value to ease mem management
+        Matrix<T>* result = new Matrix<T>(m.rows, m.cols);         //this will hold the answer, pass by value to ease mem management
         for (int a = 0; a < m.rows; a++){
             for (int b = 0; b < m.cols; b++){
                 result->mat[a][b] = this->mat[a][b] + m.mat[a][b];
@@ -164,7 +197,8 @@ Matrix& Matrix::operator+(const Matrix &m) {
     }
 }
 
-Matrix &Matrix::operator-(const Matrix &m) const {
+template<class T>
+Matrix<T> &Matrix<T>::operator-(const Matrix &m) const {
     if ((this->rows != m.rows) || (this->cols != m.cols)){
         string message = "";
         message += "The dimensions of the matrices don't match: ";
@@ -184,7 +218,8 @@ Matrix &Matrix::operator-(const Matrix &m) const {
 }
 
 //matrix multiplication function
-Matrix &Matrix::operator*(const Matrix &m) const {
+template<class T>
+Matrix<T> &Matrix<T>::operator*(const Matrix &m) const {
     if (this->cols != m.rows){
         string error = "* * * * * * * ERROR * * * * * * *\n";
         error += "Matrix dimensions incompatible for multiplication.\n";
@@ -210,10 +245,9 @@ Matrix &Matrix::operator*(const Matrix &m) const {
     }
 }
 
-//}
-
 //multiply matrix by constant value
-void Matrix::operator*=(int m) const {
+template<class T>
+void Matrix<T>::operator*=(int m) const {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] *= m;
@@ -222,7 +256,8 @@ void Matrix::operator*=(int m) const {
 }
 
 //multiply matrix by constant value
-void Matrix::operator*=(double m) const {
+template<class T>
+void Matrix<T>::operator*=(double m) const {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] *= m;
@@ -231,13 +266,14 @@ void Matrix::operator*=(double m) const {
 }
 
 //assignment operator (assign matrix to other matrix)
-void Matrix::operator=(const Matrix &m) {
+template<class T>
+void Matrix<T>::operator=(const Matrix &m) {
     this->rows = m.rows;
     this->cols = m.cols;
 
-    this->mat = new double*[rows];
+    this->mat = new T*[rows];
     for (int a = 0; a < rows; a++){
-        this->mat[a] = new double[cols];
+        this->mat[a] = new T[cols];
     }
 
     for (int a = 0; a < rows; a++){
@@ -248,7 +284,8 @@ void Matrix::operator=(const Matrix &m) {
 }
 
 //Sets all values in the matrix to the value given
-void Matrix::operator=(const int i) {
+template<class T>
+void Matrix<T>::operator=(const int i) {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] = i;
@@ -257,7 +294,8 @@ void Matrix::operator=(const int i) {
 }
 
 //Sets all values in the matrix to the value given
-void Matrix::operator=(const double d) {
+template<class T>
+void Matrix<T>::operator=(const double d) {
     for (int a = 0; a < this->rows; a++){
         for (int b = 0; b < this->cols; b++){
             this->mat[a][b] = d;
@@ -265,13 +303,33 @@ void Matrix::operator=(const double d) {
     }
 }
 
-void Matrix::print(const string& caption, int width, int precision) const{
+template<class T>
+void Matrix<T>::print(const string& caption, int width, int precision) const{
     cout << caption << endl;
     for (int a = 0; a < rows; a++){
         cout << left;
         cout << "| ";
         for (int b = 0; b < cols; b++){
             cout << setw(width) << fixed << setprecision(precision) << mat[a][b] << " ";
+        }
+        cout << " |" << endl;
+    }
+}
+
+/**
+ * A specialization of the print function that works for uint8_t and char etc.
+ * @param caption
+ * @param width
+ * @param precision
+ */
+template <>
+void Matrix<uint8_t>::print(const string& caption, int width, int precision) const{
+    cout << caption << endl;
+    for (int a = 0; a < rows; a++){
+        cout << left;
+        cout << "| ";
+        for (int b = 0; b < cols; b++){
+            cout << setw(width) << to_string(mat[a][b]) << " ";
         }
         cout << " |" << endl;
     }
@@ -286,7 +344,8 @@ void Matrix::print(const string& caption, int width, int precision) const{
  * @param i : The number of cells by which the matrix is being expanded.
  * @param dir : The direction in which the expansion should take place. u = up, d = down, r = right and l = left
  */
-void Matrix::extendLine(Matrix& image, int r, int c, int i, char dir){
+ template<class T>
+void Matrix<T>::extendLine(Matrix& image, int r, int c, int i, char dir){
     switch (dir) {
         case 'u':
             for (int a = 0; a < i; a++){                //a refers to rows changing
@@ -328,7 +387,8 @@ void Matrix::extendLine(Matrix& image, int r, int c, int i, char dir){
  * @param dir : The direction in which the expansion should take place.
  * a = left top, b = right top, c = left bottom and d = right bottom
  */
-void Matrix::extendCorner(Matrix &image, int r, int c, int i, char dir) {
+ template<class T>
+void Matrix<T>::extendCorner(Matrix &image, int r, int c, int i, char dir) {
     int originRow = 0;
     int originCol = 0;
     switch (dir) {
@@ -364,10 +424,11 @@ void Matrix::extendCorner(Matrix &image, int r, int c, int i, char dir) {
     }
 }
 
-void Matrix::expandMatrix(int i) {
+template<class T>
+void Matrix<T>::expandMatrix(int i) {
     int newSize = rows + i * 2;
     int newColsSize = cols + i * 2;
-    Matrix* biggerMatrix = new Matrix(newSize, newColsSize);  //instantiate new matrix
+    Matrix<T>* biggerMatrix = new Matrix<T>(newSize, newColsSize);  //instantiate new matrix
 
     int backEdge = newSize - i - 1;
 
@@ -397,7 +458,8 @@ void Matrix::expandMatrix(int i) {
     this->mat = biggerMatrix->mat;
 }
 
-void Matrix::toArray(double* arr) {
+template<class T>
+void Matrix<T>::toArray(T* arr) {
     int i = 0;
     for (int a = 0; a < rows; a++){
         for (int b = 0; b < cols; b++){
@@ -407,10 +469,15 @@ void Matrix::toArray(double* arr) {
     }
 }
 
-Matrix::~Matrix() {
+template<class T>
+Matrix<T>::~Matrix() {
     for (int a = 0; a < rows; a++){
         delete mat[a];
     }
     delete mat;
 }
 
+template class Matrix<double>;
+template class Matrix<float>;
+template class Matrix<uint8_t>;
+template class Matrix<int>;

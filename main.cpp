@@ -11,10 +11,12 @@ using namespace std;
 using namespace cv;
 
 bool verbose = false;
+string path = "/home/armandt/Desktop/project2021/ImageProcessing/";
 
 void readImage(){
+    cout << "\n\n * * * * * IMAGES * * * * * \n";
     try {
-        string image_path = "/home/armandt/Desktop/project2021/ImageProcessing/Images/tiny.jpg";
+        string image_path = path + "Images/tiny.jpg";
         Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
         if (snepPicture.empty()){
@@ -22,125 +24,149 @@ void readImage(){
             return;
         }
         cout << "Image loaded!\n";
-        cout << snepPicture << "\n\n";
+//        cout << snepPicture << "\n\n";
 //        imwrite("/home/armandt/Desktop/project2021/ImageProcessing/Images/red.jpg", snepPicture);
 
-        Matrix* redImage = Edges::getRed(snepPicture);
-        Matrix* blueImage = Edges::getBlue(snepPicture);
-        Matrix* greenImage = Edges::getGreen(snepPicture);
-        redImage->print("Red values", 4, 1);
+        Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
+        Matrix<uint8_t>* blueImage = Edges::getBlue(snepPicture);
+        Matrix<uint8_t>* greenImage = Edges::getGreen(snepPicture);
+//        redImage->print("Red values", 4, 1);
 
         cout << "Original rows: " << redImage->rows << endl;
         cout << "Original cols: " << redImage->cols << endl;
         redImage->expandMatrix(3);
-        redImage->print("Expanded Red-channel image.");
+        blueImage->expandMatrix(3);
+        greenImage->expandMatrix(3);
+//        redImage->print("Expanded Red-channel image.");
         cout << "Expanded rows: " << redImage->rows << endl;
         cout << "Expanded cols: " << redImage->cols << endl;
 
         Edges f(5);
         f.generateGaussian(sqrt(2));
         f.gaussianBlur(*redImage);
-        redImage->print("Blurred image:");
+        f.gaussianBlur(*blueImage);
+        f.gaussianBlur(*greenImage);
+//        redImage->print("Blurred image:");
+        cout << "Image successfully blurred.\n";
 
-        double redMatrixArray[redImage->rows * redImage->cols];
+        uint8_t redMatrixArray[redImage->rows * redImage->cols];
         redImage->toArray(redMatrixArray);
-
         Mat saveImage(redImage->rows, redImage->cols, CV_8U, redMatrixArray);
-        cout << saveImage;
-        imwrite("/home/armandt/Desktop/project2021/ImageProcessing/Images/red.jpg", saveImage);
-        cout << "\nSuccessful?\n";
+        imwrite(path + "Images/red.jpg", saveImage);
 
+        uint8_t blueMatrixArray[blueImage->rows * blueImage->cols];
+        blueImage->toArray(blueMatrixArray);
+        saveImage = Mat(blueImage->rows, blueImage->cols, CV_8U, blueMatrixArray);
+        imwrite(path + "Images/blue.jpg", saveImage);
+
+        uint8_t greenMatrixArray[greenImage->rows * greenImage->cols];
+        greenImage->toArray(greenMatrixArray);
+        saveImage = Mat(greenImage->rows, greenImage->cols, CV_8U, greenMatrixArray);
+        imwrite(path + "Images/green.jpg", saveImage);
     } catch (string& e) {
         cout << e;
     }
+    cout << "\n * * * * * IMAGES * * * * * \n";
 }
 
 void testMatrixFunctions(){
+    cout << "\n\n * * * * * MATRIX * * * * * \n";
     try {
-        Matrix mat();
+        Matrix<int> mat();
 
-        Matrix m1(3, 3, -1);
-        Matrix m2(3, 1, 7);
+        Matrix<int> m1(3, 3, 1);
+        Matrix<int> m2(3, 1, 7);
         m1.print("M1", 5);
         m2.print("M2", 5);
 
-        Matrix copied = m2;
-        copied.print("Copied from m2");
+        Matrix<int> copied = m2;
+        copied.print("Copied from m2", 3);
 
-        Matrix m3 = m1 * m2;
-        m3.print("M3 = M1 * M2");
+        Matrix<int> m3 = m1 * m2;
+        m3.print("M3 = M1 * M2", 3);
 
-        Matrix kernel = Matrix(3,3, 1);
-        Matrix image2 = Matrix(3, 3, 2);
+        m3 = m3 + m2;
+        m3.print("M3 = M3 + M2", 3);
 
-        Matrix m4 = kernel * image2;
-        m4.print("M4 = kernel * image2 ");
+        Matrix<int> kernel = Matrix<int>(3,3, 1);
+        Matrix<int> image2 = Matrix<int>(3, 3, 2);
 
-        double middleVal = Matrix::convolve(kernel, image2);
+        Matrix<int> m4 = kernel * image2;
+        m4.print("M4 = kernel * image2 ", 3);
+
+        int middleVal = Matrix<int>::convolve(kernel, image2);
         cout << "Result of convolution = " << to_string(middleVal) << endl;
+
+        m4.expandMatrix(2);
+        m4.print("M4 was expanded by 2", 3);
     } catch (string& e) {
         cout << e;
     }
+    cout << "\n * * * * * MATRIX * * * * * \n";
 }
 
 void testColorConversion(){
+    cout << "\n\n * * * * * COLOR CONVERSION * * * * * \n";
     try {
-        double rgbList[] = {31, 49, 242};
-        Matrix RGB(3, 1, rgbList);
+       double rgbList[] = {31, 49, 242};
+       Matrix<double> RGB(3, 1, rgbList);
 
-        RGB.print("RGB");
-        Color::rgbtoXyz(RGB);
-        RGB.print("XYZ");
-        Color::xyztoLab(RGB);
-        RGB.print("LAB");
+       RGB.print("RGB");
+       Color::rgbtoXyz(RGB);
+       RGB.print("XYZ");
+       Color::xyztoLab(RGB);
+       RGB.print("LAB");
 
-        int BGR2[] = {242, 85, 17};
-        Matrix* RGB2matrix = Color::rgbtoLab(BGR2);
+       int BGR2[] = {242, 85, 17};
+       Matrix<double>* RGB2matrix = Color::rgbtoLab(BGR2);
 
-        double difference = Color::deltaE(RGB, *RGB2matrix);
-        cout << "Delta E = " << to_string(difference) << endl;
+       double difference = Color::deltaE(RGB, *RGB2matrix);
+       cout << "Delta E = " << to_string(difference) << endl;
 
-        cout << Color::classifyColor(*RGB2matrix);
+       cout << Color::classifyColor(*RGB2matrix);
     } catch (string& e) {
-        cout << e;
+       cout << e;
     }
+    cout << "\n * * * * * COLOR CONVERSION * * * * * \n";
 }
 
 void testMixingFunctions(){
+    cout << "\n\n * * * * * MIXING * * * * * \n";
     try {
         double col1[3] = {100, 100, 100};       //doesn't really matter that the numbers are unrealistic
         double col2[3] = {75, 75, 75};
         double col3[3] = {50, 50, 50};
         double col4[3] = {25, 25, 25};
         double col5[3] = {0, 0, 0};
+ 
+        Matrix<double> m1(3, 1, col1);
+        Matrix<double> m2(3, 1, col2);
+        Matrix<double> m3(3, 1, col3);
+        Matrix<double> m4(3, 1, col4);
+        Matrix<double> m5(3, 1, col5);
 
-        Matrix m1(3, 1, col1);
-        Matrix m2(3, 1, col2);
-        Matrix m3(3, 1, col3);
-        Matrix m4(3, 1, col4);
-        Matrix m5(3, 1, col5);
-
-
-        Matrix unmixedPixels[4] = {m1, m1, m5, m5};    //array of Lab pixel values
-        Matrix mixedPixels[4] = {m1, m2, m3, m4};
-
-        Matrix ave = *(Mixing::averageLab(unmixedPixels, 4));
+        Matrix<double> unmixedPixels[4] = {m1, m1, m5, m5};    //array of Lab pixel values
+        Matrix<double> mixedPixels[4] = {m1, m2, m3, m4};
+ 
+        Matrix<double> ave = *(Mixing::averageLab(unmixedPixels, 4));
         ave.print("Average L*a*b* value", 3);
-
+ 
         double standardDeviation = Mixing::standardDeviation(unmixedPixels, 4);
         cout << "Standard deviation (unmixed) = " <<  to_string(standardDeviation) << endl;   //for unmixed stuff
-
+ 
         standardDeviation = Mixing::standardDeviation(mixedPixels, 4);
         cout << "Standard deviation (mixed) = " <<  to_string(standardDeviation) << endl;   //for mixed stuff
-
+ 
         double RMI = Mixing::quantifyMixing(mixedPixels, 4, unmixedPixels, 4);
         cout << "RMI for the pixels = " << to_string(RMI) << endl;
     } catch (string& e) {
-        cout << e;
+       cout << e;
     }
+    cout << "\n * * * * * MIXING * * * * * \n";
 }
 
 void testEdgeDetection(){
+    cout << "\n\n * * * * * EDGES * * * * * \n";
     try{
         Edges e(7);
         e.print("Before");
@@ -152,23 +178,23 @@ void testEdgeDetection(){
         e.gaussianMatrix.expandMatrix(2);
         e.gaussianMatrix.print("Expanded matrix", 5, 2);
 
-        Matrix image(15, 15, 1);
-        Matrix kernel(3, 3, 2);
-        Matrix blurredImage(15, 15);
+        Matrix<uint8_t> image(15, 15, 1);
+        Matrix<uint8_t> kernel(3, 3, 2);
+        Matrix<uint8_t> blurredImage(15, 15);
 
-        double d = Matrix::convolve(kernel, 0, 0, image, blurredImage, 1);
+        double d = Matrix<uint8_t>::convolve(kernel, 0, 0, image, blurredImage, 1);
         cout << d << endl;
 
         Edges f(5);
         f.generateGaussian(sqrt(2));
-        Matrix gaussianStandIn(5, 5, 1);
+        Matrix<uint8_t> gaussianStandIn(5, 5, 1);
 
         f.gaussianBlur(image);
         image.print("Blurred:");
     } catch (string& e){
         cout << e;
     }
-
+    cout << "\n * * * * * EDGES * * * * * \n";
 }
 
 int main() {

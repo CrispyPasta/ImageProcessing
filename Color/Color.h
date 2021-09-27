@@ -15,15 +15,15 @@ public:
 
     static double linearizeRGB(int C);
 
-    static void rgbtoXyz(Matrix& BGR);
+    static void rgbtoXyz(Matrix<double>& BGR);
 
-    static void xyztoLab(Matrix& xyz);
+    static void xyztoLab(Matrix<double>& xyz);
 
-    static Matrix* rgbtoLab(int* image);
+    static Matrix<double>* rgbtoLab(int* image);
 
-    static double deltaE(Matrix& val1, Matrix& val2);
+    static double deltaE(Matrix<double>& val1, Matrix<double>& val2);
 
-    static std::string classifyColor(Matrix& val);
+    static std::string classifyColor(Matrix<double>& val);
 };
 
 #endif //IMAGEPROCESSING_COLOR_H
