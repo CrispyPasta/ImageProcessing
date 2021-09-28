@@ -81,7 +81,7 @@ void readImage(){
         saveGreyscale("red", *redImage);
         saveGreyscale("blue", *blueImage);
         saveGreyscale("green", *greenImage);
-        saveColor("reconst", *redImage, *greenImage, *blueImage);
+        saveColor("rebuilt", *redImage, *greenImage, *blueImage);
     } catch (string& e) {
         cout << e;
     }

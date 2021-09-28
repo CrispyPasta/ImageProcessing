@@ -520,7 +520,8 @@ void Matrix<T>::expandMatrix(int i) {
     int newColsSize = cols + i * 2;
     Matrix<T>* biggerMatrix = new Matrix<T>(newSize, newColsSize);  //instantiate new matrix
 
-    int backEdge = newSize - i - 1;
+    int backEdge = newColsSize - i - 1;
+    int bottomEdge = newSize -i - 1;
 
     for (int a = i; a < rows + i; a++){     //fill in the middle of the matrix
         for (int b = i; b < cols + i; b++){
@@ -530,18 +531,20 @@ void Matrix<T>::expandMatrix(int i) {
 
     for (int a = i; a < backEdge + 1; a++){ //extend in lines
         Matrix::extendLine(*biggerMatrix, i, a, i, 'u');
-        Matrix::extendLine(*biggerMatrix, backEdge, a, i, 'd');
+        Matrix::extendLine(*biggerMatrix, bottomEdge, a, i, 'd');
+    }
+
+    for (int a = i; a < bottomEdge + 1; a++){
         Matrix::extendLine(*biggerMatrix, a, i, i, 'l');
         Matrix::extendLine(*biggerMatrix, a, backEdge, i, 'r');
     }
 
     Matrix::extendCorner(*biggerMatrix, i, i, i, 'a');  //extend the corners
     Matrix::extendCorner(*biggerMatrix, i, backEdge, i, 'b');
-    Matrix::extendCorner(*biggerMatrix, backEdge, i, i, 'c');
-    Matrix::extendCorner(*biggerMatrix, backEdge, backEdge, i, 'd');
+    Matrix::extendCorner(*biggerMatrix, bottomEdge, i, i, 'c');
+    Matrix::extendCorner(*biggerMatrix, bottomEdge, backEdge, i, 'd');
 
 //    biggerMatrix->print("Expanded matrix", 6, 2);
-
     this->rows = biggerMatrix->rows;
     this->cols = biggerMatrix->cols;
     delete this->mat;
