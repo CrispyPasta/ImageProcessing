@@ -6,6 +6,8 @@
 #define IMAGEPROCESSING_MATRIX_H
 
 #include <string>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/matx.hpp>
 
 template <class T>
 class Matrix {
@@ -30,6 +32,8 @@ public:
     Matrix(const Matrix& copy);
 
     static double convolve(Matrix& m1, Matrix& m2);
+
+    static double convolve(Matrix& m1, cv::Mat& image, char c);
 
     static double convolve(Matrix& m1, int r, int c, Matrix& m2, Matrix& out, double t);
 

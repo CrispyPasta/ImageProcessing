@@ -13,6 +13,35 @@ using namespace cv;
 bool verbose = false;
 string path = "/home/armandt/Desktop/project2021/ImageProcessing/";
 
+bool saveGreyscale(string name, Matrix<uint8_t>& imageMatrix){
+    try {
+        uint8_t array[imageMatrix.rows * imageMatrix.cols];
+        imageMatrix.toArray(array);
+        Mat imageMat(imageMatrix.rows, imageMatrix.cols, CV_8U, array);
+        imwrite(path + "Images/" + name + ".jpg", imageMat);
+        return true;
+    } catch (...) {
+        cout << "An error occurred while trying to save the image as greyscale.\n";
+        return false;
+    }
+}
+
+
+bool saveColor(string name, Matrix<uint8_t>& red, Matrix<uint8_t>& green, Matrix<uint8_t>& blue){
+    try {
+        auto* reconstructedImage = Matrix<uint8_t>::combineChannels(red, green, blue);
+        uint8_t array[reconstructedImage->rows * reconstructedImage->cols];
+        reconstructedImage->toArray(array);
+        Mat imageMat(reconstructedImage->rows, reconstructedImage->cols / 3, CV_8UC3, array);
+        imwrite(path + "Images/" + name + ".jpg", imageMat);
+        delete reconstructedImage;
+        return true;
+    } catch (...) {
+        cout << "An error occurred while trying to save the image as color.\n";
+        return false;
+    }
+}
+
 void readImage(){
     cout << "\n\n * * * * * IMAGES * * * * * \n";
     try {
@@ -49,26 +78,10 @@ void readImage(){
 //        redImage->print("Blurred image:");
         cout << "Image successfully blurred.\n";
 
-        uint8_t redMatrixArray[redImage->rows * redImage->cols];
-        redImage->toArray(redMatrixArray);
-        Mat saveImage(redImage->rows, redImage->cols, CV_8U, redMatrixArray);
-        imwrite(path + "Images/red.jpg", saveImage);
-
-        uint8_t blueMatrixArray[blueImage->rows * blueImage->cols];
-        blueImage->toArray(blueMatrixArray);
-        saveImage = Mat(blueImage->rows, blueImage->cols, CV_8U, blueMatrixArray);
-        imwrite(path + "Images/blue.jpg", saveImage);
-
-        uint8_t greenMatrixArray[greenImage->rows * greenImage->cols];
-        greenImage->toArray(greenMatrixArray);
-        saveImage = Mat(greenImage->rows, greenImage->cols, CV_8U, greenMatrixArray);
-        imwrite(path + "Images/green.jpg", saveImage);
-
-        auto* reconstructedImage = Matrix<uint8_t>::combineChannels(*redImage, *greenImage, *blueImage);
-        uint8_t reconstrArr[reconstructedImage->rows * reconstructedImage->cols];
-        reconstructedImage->toArray(reconstrArr);
-        saveImage = Mat(reconstructedImage->rows, reconstructedImage->cols / 3, CV_8UC3, reconstrArr);
-        imwrite(path + "Images/rebuilt.jpg", saveImage);
+        saveGreyscale("red", *redImage);
+        saveGreyscale("blue", *blueImage);
+        saveGreyscale("green", *greenImage);
+        saveColor("reconst", *redImage, *greenImage, *blueImage);
     } catch (string& e) {
         cout << e;
     }

@@ -5,6 +5,7 @@
 #include <iomanip>
 #include "Matrix.h"
 using namespace std;
+using namespace cv;
 
 template<class T>
 Matrix<T>::Matrix() {
@@ -112,6 +113,61 @@ double Matrix<T>::convolve(Matrix &m1, Matrix &m2) {
     for (int i = 0; i < m; i++){
         for (int j = 0; j < n; j++){
             result += m1.mat[m - i - 1][n - j - 1] * m2.mat[i][j];
+        }
+    }
+
+    return result;
+}
+
+template<class T>
+double Matrix<T>::convolve(Matrix &m1, cv::Mat &image, char c) {
+    if ((m1.rows != m1.cols) || (image.rows != image.cols)){
+        string error = "* * * * * * * ERROR * * * * * * *\n";
+        error += "One or both of the matrices are asymmetrical.\n";
+        throw error;
+    }
+    if ((m1.rows != image.rows) || (m1.cols != image.cols)){
+        string error = "* * * * * * * ERROR * * * * * * *\n";
+        error += "The matrices submitted do no have the same dimensions:\nM1: [";
+        error += to_string(m1.rows) + ", " + to_string(m1.cols) + "]";
+        error += ", M2: [";
+        error += to_string(image.rows) + ", " + to_string(image.cols) + "]\n";
+        throw error;
+    }
+
+    double result = 0.0;
+    int m = m1.rows;
+    int n = m;  //if the matrices have equal dimensions, then gaussianMatrix = n
+    Vec3b intensity;
+    int channel = -1;
+
+    switch (c) {
+        case 'r':
+            channel = 2;
+            break;
+        case 'g':
+            channel = 1;
+            break;
+        case 'b':
+            channel = 0;
+            break;
+        default:
+            channel = 0;
+            break;
+    }
+
+    if (c == 'n'){
+        for (int i = 0; i < m; i++){
+            for (int j = 0; j < n; j++){
+                result += m1.mat[m - i - 1][n - j - 1] * image.at<uint8_t>(i, j);
+            }
+        }
+    } else {
+        for (int i = 0; i < m; i++){
+            for (int j = 0; j < n; j++){
+                intensity = image.at<uint8_t>(i, j);
+                result += m1.mat[m - i - 1][n - j - 1] * intensity.val[channel];
+            }
         }
     }
 
