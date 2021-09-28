@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <chrono>
 #include "Matrix/Matrix.h"
 #include "Color/Color.h"
 #include "Mixing/Mixing.h"
@@ -9,6 +10,7 @@
 
 using namespace std;
 using namespace cv;
+using namespace chrono;
 
 bool verbose = false;
 string path = "/home/armandt/Desktop/project2021/ImageProcessing/";
@@ -25,7 +27,6 @@ bool saveGreyscale(string name, Matrix<uint8_t>& imageMatrix){
         return false;
     }
 }
-
 
 bool saveColor(string name, Matrix<uint8_t>& red, Matrix<uint8_t>& green, Matrix<uint8_t>& blue){
     try {
@@ -63,14 +64,14 @@ void readImage(){
 
         cout << "Original rows: " << redImage->rows << endl;
         cout << "Original cols: " << redImage->cols << endl;
-        redImage->expandMatrix(3);
-        blueImage->expandMatrix(3);
-        greenImage->expandMatrix(3);
+        redImage->expandMatrix(1);
+        blueImage->expandMatrix(1);
+        greenImage->expandMatrix(1);
 //        redImage->print("Expanded Red-channel image.");
         cout << "Expanded rows: " << redImage->rows << endl;
         cout << "Expanded cols: " << redImage->cols << endl;
 
-        Edges f(5);
+        Edges f(3);
         f.generateGaussian(sqrt(2));
         f.gaussianBlur(*redImage);
         f.gaussianBlur(*blueImage);
@@ -78,9 +79,9 @@ void readImage(){
 //        redImage->print("Blurred image:");
         cout << "Image successfully blurred.\n";
 
-        saveGreyscale("red", *redImage);
-        saveGreyscale("blue", *blueImage);
-        saveGreyscale("green", *greenImage);
+//        saveGreyscale("red", *redImage);
+//        saveGreyscale("blue", *blueImage);
+//        saveGreyscale("green", *greenImage);
         saveColor("rebuilt", *redImage, *greenImage, *blueImage);
     } catch (string& e) {
         cout << e;
@@ -217,10 +218,17 @@ void testEdgeDetection(){
 }
 
 int main() {
-    readImage();
-//    testMatrixFunctions();
-//    testColorConversion();
-//    testMixingFunctions();
-//    testEdgeDetection();
+    auto start = high_resolution_clock::now();
+
+//    readImage();
+    testMatrixFunctions();
+    testColorConversion();
+    testMixingFunctions();
+    testEdgeDetection();
+
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end-start);
+    cout << "Execution complete\n";
+    cout << "Time to execute: " << duration.count() << " milliseconds.\n";
     return 0;
 }

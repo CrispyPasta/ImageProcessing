@@ -241,29 +241,35 @@ double Matrix<T>::convolve(Matrix<double>& m1, int r, int c, Matrix<uint8_t>& m2
  */
 template<class T>
 Matrix<T> *Matrix<T>::combineChannels(Matrix &red, Matrix &green, Matrix &blue) {
-    bool sameSize = false;
-    if ((red.rows == green.rows) && (green.rows == blue.rows)){
-        if ((red.cols == green.cols) && (green.cols == blue.cols)){
-            sameSize = true;
-        }
-    }
-    if (!sameSize){
-        string e = "The red, green and blue matrix objects don't have the same dimensions.\n";
-        e += "Red: " + to_string(red.rows) + "x" + to_string(red.cols) + '\t';
-        e += "Green: " + to_string(green.rows) + "x" + to_string(green.cols) + '\t';
-        e += "Blue: " + to_string(blue.rows) + "x" + to_string(blue.cols);
-        throw e;
-    } else {
-        auto* BGRimage = new Matrix<T>(red.rows, red.cols * 3);
-
-        for (int a = 0; a < BGRimage->rows; a++){
-            for(int b = 0; b < red.cols; b++){
-                BGRimage->mat[a][b * 3] = blue.mat[a][b];
-                BGRimage->mat[a][b * 3 + 1] = green.mat[a][b];
-                BGRimage->mat[a][b * 3 + 2] = red.mat[a][b];
+    try{
+        bool sameSize = false;
+        if ((red.rows == green.rows) && (green.rows == blue.rows)){
+            if ((red.cols == green.cols) && (green.cols == blue.cols)){
+                sameSize = true;
             }
         }
-        return BGRimage;
+        if (!sameSize){
+            string e = "The red, green and blue matrix objects don't have the same dimensions.\n";
+            e += "Red: " + to_string(red.rows) + "x" + to_string(red.cols) + '\t';
+            e += "Green: " + to_string(green.rows) + "x" + to_string(green.cols) + '\t';
+            e += "Blue: " + to_string(blue.rows) + "x" + to_string(blue.cols);
+            throw e;
+        } else {
+            auto* BGRimage = new Matrix<T>(red.rows, red.cols * 3);
+
+            for (int a = 0; a < BGRimage->rows; a++){
+                for(int b = 0; b < red.cols; b++){
+                    BGRimage->mat[a][b * 3] = blue.mat[a][b];
+                    BGRimage->mat[a][b * 3 + 1] = green.mat[a][b];
+                    BGRimage->mat[a][b * 3 + 2] = red.mat[a][b];
+                }
+            }
+            return BGRimage;
+        }
+    } catch (...) {
+        string e = "An error occurred in the combineChannels function.\n";
+        cout << endl << e;
+        throw e;
     }
 }
 
