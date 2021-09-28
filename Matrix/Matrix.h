@@ -35,13 +35,13 @@ public:
 
     static double convolve(Matrix<double>& m1, int r, int c, Matrix<uint8_t>& m2, Matrix<uint8_t>& out, double t);
 
+    static Matrix* combineChannels(Matrix& red, Matrix& green, Matrix& blue);
+
     Matrix& operator+(const Matrix& m);
 
     Matrix& operator-(const Matrix& m) const;
 
     Matrix& operator*(const Matrix& m) const;
-
-//    Matrix& operator*(const double& d) const;
 
     void operator*=(int m) const;
 

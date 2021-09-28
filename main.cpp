@@ -16,7 +16,7 @@ string path = "/home/armandt/Desktop/project2021/ImageProcessing/";
 void readImage(){
     cout << "\n\n * * * * * IMAGES * * * * * \n";
     try {
-        string image_path = path + "Images/tiny.jpg";
+        string image_path = path + "Images/snep.jpg";
         Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
         if (snepPicture.empty()){
@@ -63,6 +63,12 @@ void readImage(){
         greenImage->toArray(greenMatrixArray);
         saveImage = Mat(greenImage->rows, greenImage->cols, CV_8U, greenMatrixArray);
         imwrite(path + "Images/green.jpg", saveImage);
+
+        auto* reconstructedImage = Matrix<uint8_t>::combineChannels(*redImage, *greenImage, *blueImage);
+        uint8_t reconstrArr[reconstructedImage->rows * reconstructedImage->cols];
+        reconstructedImage->toArray(reconstrArr);
+        saveImage = Mat(reconstructedImage->rows, reconstructedImage->cols / 3, CV_8UC3, reconstrArr);
+        imwrite(path + "Images/rebuilt.jpg", saveImage);
     } catch (string& e) {
         cout << e;
     }
