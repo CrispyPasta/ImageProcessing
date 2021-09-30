@@ -5,16 +5,21 @@
 #ifndef IMAGEPROCESSING_EDGES_H
 #define IMAGEPROCESSING_EDGES_H
 #include "../Matrix/Matrix.h"
+#include "../Utility/Utility.h"
 #include <opencv2/opencv.hpp>
+
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <string>
+#include <math.h>
 using namespace cv;
 
 class Edges {
 private:
     static Matrix<uint8_t>* getChannel(Mat& image, int i);
+    Matrix<int> Kx;
+    Matrix<int> Ky;
 public:
     double sigma;
     int size;
@@ -30,11 +35,17 @@ public:
 
     void gaussianBlur(Matrix<uint8_t>& image);
 
+    slope sobelPixel(Mat& image, int r, int c);
+
+    void sobelImage(Mat& image, slope** output, int p);
+
     static Matrix<uint8_t>* getRed(Mat& image);
 
     static Matrix<uint8_t>* getBlue(Mat& image);
 
     static Matrix<uint8_t>* getGreen(Mat& image);
+
+    static Matrix<uint8_t>* toMatrix(Mat& image);
 
     void print(std::string caption, int s = 5);
 

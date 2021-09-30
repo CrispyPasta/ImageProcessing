@@ -8,6 +8,7 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/matx.hpp>
+#include "../Utility/Utility.h"
 
 template <class T>
 class Matrix {
@@ -33,7 +34,7 @@ public:
 
     static double convolve(Matrix& m1, Matrix& m2);
 
-    static double convolve(Matrix& m1, cv::Mat& image, char c);
+    static double convolve(Matrix& m1, cv::Mat& image, int r, int c, char chan);
 
     static double convolve(Matrix& m1, int r, int c, Matrix& m2, Matrix& out, double t);
 
@@ -62,6 +63,8 @@ public:
     void print(const std::string& caption = "", int width = 7, int precision = 3) const;
 
     void toArray(T* arr);
+
+    cv::Mat* toMat();
 
     ~Matrix();
 };

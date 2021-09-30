@@ -46,7 +46,7 @@ bool saveColor(string name, Matrix<uint8_t>& red, Matrix<uint8_t>& green, Matrix
 void readImage(){
     cout << "\n\n * * * * * IMAGES * * * * * \n";
     try {
-        string image_path = path + "Images/snep.jpg";
+        string image_path = path + "Images/tiny.jpg";
         Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
         if (snepPicture.empty()){
@@ -114,7 +114,7 @@ void testMatrixFunctions(){
         Matrix<int> m4 = kernel * image2;
         m4.print("M4 = kernel * image2 ", 3);
 
-        int middleVal = Matrix<int>::convolve(kernel, image2);
+        double middleVal = Matrix<int>::convolve(kernel, image2);
         cout << "Result of convolution = " << to_string(middleVal) << endl;
 
         m4.expandMatrix(2);
@@ -211,6 +211,40 @@ void testEdgeDetection(){
 
         f.gaussianBlur(image);
         image.print("Blurred:");
+
+        string image_path = path + "Images/tinier.jpg";
+        Mat snepPicture = imread(image_path, IMREAD_GRAYSCALE);
+
+        if (snepPicture.empty()){
+            cout << "Image not loaded\n";
+            return;
+        }
+        cout << "Image loaded!\n";
+        cout << snepPicture;
+
+        auto sobel = e.sobelPixel(snepPicture, 0, 0);
+        cout << endl << sobel.magnitude << endl;
+        cout << sobel.direction << endl;
+
+        auto imageMat = Edges::toMatrix(snepPicture);
+        imageMat->expandMatrix(1);
+        Mat expandedImage = *(imageMat->toMat());
+
+        slope** imageSlopes = new slope*[snepPicture.rows];
+        for (int a = 0; a < snepPicture.rows; a++){
+            imageSlopes[a] = new slope[snepPicture.cols];
+        }
+
+        e.sobelImage(expandedImage, imageSlopes, 1);
+
+//        for (int a = 0; a < snepPicture.rows - 1; a++){
+//            for (int b = 0; b < snepPicture.cols - 1; b++){
+//                cout << "G=" << imageSlopes[a][b].magnitude << '\t';
+//                cout << "θ=" << setprecision(2) << imageSlopes[a][b].direction << '\t';
+//            }
+//            cout << endl;
+//        }
+
     } catch (string& e){
         cout << e;
     }
@@ -221,9 +255,9 @@ int main() {
     auto start = high_resolution_clock::now();
 
 //    readImage();
-    testMatrixFunctions();
-    testColorConversion();
-    testMixingFunctions();
+//    testMatrixFunctions();
+//    testColorConversion();
+//    testMixingFunctions();
     testEdgeDetection();
 
     auto end = high_resolution_clock::now();

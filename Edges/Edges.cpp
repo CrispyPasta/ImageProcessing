@@ -14,6 +14,11 @@ Edges::Edges() {
     size = 7;
     k = 3;
     gaussianMatrix = Matrix<double>(size, size);
+
+    int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    int KyList[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+    Kx = Matrix<int>(3, 3, KxList);
+    Ky = Matrix<int>(3, 3, KyList);
 }
 
 /**
@@ -28,6 +33,10 @@ Edges::Edges(int s) {
     k = (s - 1) / 2;
     //matrix is an array of pointers
     gaussianMatrix = Matrix<double>(s, s);
+    int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    int KyList[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+    Kx = Matrix<int>(3, 3, KxList);
+    Ky = Matrix<int>(3, 3, KyList);
 }
 
 /**
@@ -82,6 +91,44 @@ void Edges::gaussianBlur(Matrix<uint8_t> &image) {
 }
 
 /**
+ * Performs the sobel operation on a given image kernel (3x3 pixels).
+ * @param image : The portion of the image for which the Sobel operation must be used.
+ * @return : A slope struct containing the magnitude and direction of the slope at that point.
+ */
+slope Edges::sobelPixel(Mat &image, int r, int c) {
+    int Ix = Matrix<int>::convolve(Kx, image, r, c, 'n');
+    int Iy = Matrix<int>::convolve(Ky, image, r, c, 'n');
+
+    float G = sqrt(Ix * Ix + Iy * Iy);
+    float sig = atan(Iy / Ix) * 57.29577951;        //convert to degrees
+    return {G, sig};
+}
+
+/**
+ * Calculates the slopes for the entire image using the sobel operator. Assuming the image is expanded by more than just
+ * one pixel, the p parameter lets you set the position where the function starts calculating the slope.
+ * @param image : The mat image object.
+ * @param output : A 2D array of slope structs
+ * @param p : How many pixels were added to the image when it was expanded.
+ */
+void Edges::sobelImage(Mat &image, slope **output, int p) {
+    try{
+        int rows = image.rows;
+        int cols = image.cols;
+        int offset = p - 1;
+
+        for (int a = 0; a < rows - p - p; a++){
+            for (int b = 0; b < cols - p - p; b++){
+                output[a][b] = sobelPixel(image, a + offset, b + offset);
+            }
+        }
+    } catch (...) {
+        string e = "An error was encountered in the sobelImage function.\n";
+        throw e;
+    }
+}
+
+/**
  * Returns an image containing only the desired color channel's data. i determines which channel is returned.
  * @param image : The image (opencv:mat object)
  * @param i : 2 for red, 1 for green and 0 for blue
@@ -111,6 +158,20 @@ Matrix<uint8_t>* Edges::getGreen(Mat &image) {
 
 Matrix<uint8_t>* Edges::getBlue(Mat &image) {
     return getChannel(image, 0);
+}
+
+Matrix<uint8_t> *Edges::toMatrix(Mat &image) {
+    auto* imageChannel = new Matrix<uint8_t>(image.rows, image.cols);
+    uint8_t intensity;
+
+    for (int a = 0; a < imageChannel->rows; a++){
+        for (int b = 0; b < imageChannel->cols; b++){
+            intensity = image.at<uint8_t>(a, b);
+            imageChannel->mat[a][b] = intensity;
+        }
+    }
+
+    return imageChannel;
 }
 
 /**
