@@ -5,6 +5,7 @@
 #include "Color.h"
 #include <iostream>
 #include <math.h>
+#include "../Utility/Utility.h"
 using namespace std;
 using namespace cv;
 
@@ -17,7 +18,7 @@ auto Red = Matrix<double>(3, 1, red);
 
 Matrix<double> classificationColors[] = {Blue, Red};
 
-string colorNames[] = {"Blue", "Red"};
+std::string colorNames[] = {"Blue", "Red"};
 int numClassificationColors = 2;
 //* * * * * * * * * CLASSIFICATION COLORS * * * * * * * * *
 

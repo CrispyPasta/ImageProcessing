@@ -18,8 +18,11 @@ using namespace cv;
 class Edges {
 private:
     static Matrix<uint8_t>* getChannel(Mat& image, int i);
+
+    int getOrientationSector(double Ix, double Iy);
     Matrix<int> Kx;
     Matrix<int> Ky;
+    double rotationMatrix[4] = {0.923879, -0.382683, 0.382683, 0.923879};
 public:
     double sigma;
     int size;
@@ -37,7 +40,15 @@ public:
 
     slope sobelPixel(Mat& image, int r, int c);
 
+    void nonMaximumSuppression(slope** image, int r, int c);
+
+    int getSector(double angle);
+
     void sobelImage(Mat& image, slope** output, int p);
+
+    static void maxMagnitudeGradient(edgePixel**, int r, int c);
+
+    static void maxMagnitudeGradient(edgePixel& pixel);
 
     static Matrix<uint8_t>* getRed(Mat& image);
 

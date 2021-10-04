@@ -4,7 +4,9 @@
 
 #include "Edges.h"
 #include <math.h>
+#include <cmath>
 #include <iostream>
+#include "../Utility/Utility.h"
 using namespace std;
 
 /**
@@ -91,17 +93,82 @@ void Edges::gaussianBlur(Matrix<uint8_t> &image) {
 }
 
 /**
+ * Performs non-maxima suppression on the portion of the image given, indicated by r and c.
+ * @param image : The array of slopes and magnitudes of the image (2D slope array)
+ * @param r : the row of the pixel being considered
+ * @param c : the col of the pixel being considered
+ */
+void Edges::nonMaximumSuppression(slope** image, int r, int c) {
+    int plusDelta[4][2] = {{1,0}, {1,1}, {0,1}, {-1,1}};
+    int minDelta[4][2] = {{-1,0}, {-1,-1}, {0,-1}, {1,-1}};
+
+    double t = abs(image[r][c].direction + 11.25);
+    int direction = round(t / 22.5);
+}
+
+/**
  * Performs the sobel operation on a given image kernel (3x3 pixels).
  * @param image : The portion of the image for which the Sobel operation must be used.
  * @return : A slope struct containing the magnitude and direction of the slope at that point.
  */
 slope Edges::sobelPixel(Mat &image, int r, int c) {
-    int Ix = Matrix<int>::convolve(Kx, image, r, c, 'n');
-    int Iy = Matrix<int>::convolve(Ky, image, r, c, 'n');
+    int Ix = round(Matrix<int>::convolve(Kx, image, r, c, 'n') / 8.0);     //convolve and normalize
+    int Iy = round(Matrix<int>::convolve(Ky, image, r, c, 'n') / 8.0);
 
-    float G = sqrt(Ix * Ix + Iy * Iy);
-    float sig = atan(Iy / Ix) * 57.29577951;        //convert to degrees
+    double G = sqrt(Ix * Ix + Iy * Iy);
+    double sig = atan2(Iy, Ix) * 57.29577951;        //convert to degrees
+    sig  = getSector(sig);
+//    double sig = getOrientationSector(Ix, Iy);
     return {G, sig};
+}
+
+/**
+ * This is supposed to be a more efficient way to get the sector of the gradient direction but I suspect that it's not
+ * working correctly for some reason.
+ * @param Ix
+ * @param Iy
+ * @return
+ */
+int Edges::getOrientationSector(double Ix, double Iy) {
+    Matrix<double> rotator(2, 2, rotationMatrix);
+    double tmp[] = {Ix, Iy};
+    Matrix<double> gradient(2, 1, tmp);
+    Matrix<double> rotatedMatrix = rotator * gradient;
+    Ix = rotatedMatrix.mat[0][0];
+    Iy = rotatedMatrix.mat[1][0];
+
+    if (Iy < 0){
+        Ix *= -1;
+        Iy *= -1;
+    }
+
+    if ((Ix >= 0) && (Ix >= Iy)) {
+        return 0;
+    } else if ((Ix >= 0) && (Ix < Iy)) {
+        return 1;
+    } else if ((Ix < 0) && (-Ix < Iy)) {
+        return 2;
+    } else if ((Ix < 0) && (-Ix >= Iy)) {
+        return 3;
+    }
+
+    return -1;
+}
+
+int Edges::getSector(double angle){
+    if (angle < 0){
+        angle += 180;
+    }
+    if (((angle >= 0) && (angle <= 22.5)) || ((angle <= 180) && (angle >= 157.5))){
+        return 0;
+    } else if ((angle > 22.5) && (angle <= 67.5)){
+        return 3;
+    } else if ((angle > 67.5) && (angle <= 112.5)){
+        return 2;
+    } else {
+        return 1;
+    }
+    return -1;
 }
 
 /**
@@ -125,6 +192,50 @@ void Edges::sobelImage(Mat &image, slope **output, int p) {
     } catch (...) {
         string e = "An error was encountered in the sobelImage function.\n";
         throw e;
+    }
+}
+
+/**
+ * Iterates over a 2D matrix of edgePixel structs and puts the greatest G value into the R channel.
+ * That way, you only have to look at the red pixels to get the highest value for that pixel.
+ * @param image : 2D array of edgepixel structs, containing the G value for R, G and B (after using sobel).
+ * @param r : rows in the array
+ * @param c : cols in the array
+ */
+void Edges::maxMagnitudeGradient(edgePixel** image, int r, int c) {
+    for (int a = 0; a < r; a++){
+        for (int b = 0; b < c; b++){
+            maxMagnitudeGradient(image[a][b]);
+        }
+    }
+}
+
+/**
+ * Compare the G values for R, G and B and set the "max" char accordingly. This is the best way to combine the data from
+ * three color channels into one for edge detection.
+ * @param p : an edgePixel struct containing the output from the sobel operation
+ */
+void Edges::maxMagnitudeGradient(edgePixel& p) {
+    if (p.Rmag >= p.Bmag){
+        if (p.Rmag >= p.Gmag){
+            p.max = 'R';
+            p.maxMag = p.Rmag;
+            p.maxAngle = p.Rdir;
+        } else {
+            p.max = 'G';
+            p.maxMag = p.Gmag;
+            p.maxAngle = p.Gdir;
+        }
+    } else {
+        if (p.Bmag >= p.Gmag){
+            p.max = 'B';
+            p.maxMag = p.Bmag;
+            p.maxAngle = p.Bdir;
+        } else {
+            p.max = 'G';
+            p.maxMag = p.Gmag;
+            p.maxAngle = p.Gdir;
+        }
     }
 }
 

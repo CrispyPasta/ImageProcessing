@@ -237,13 +237,29 @@ void testEdgeDetection(){
 
         e.sobelImage(expandedImage, imageSlopes, 1);
 
-//        for (int a = 0; a < snepPicture.rows - 1; a++){
-//            for (int b = 0; b < snepPicture.cols - 1; b++){
+        for (int a = 0; a < snepPicture.rows - 1; a++){
+            for (int b = 0; b < snepPicture.cols - 1; b++){
 //                cout << "G=" << imageSlopes[a][b].magnitude << '\t';
-//                cout << "θ=" << setprecision(2) << imageSlopes[a][b].direction << '\t';
-//            }
-//            cout << endl;
-//        }
+                cout << "θ = " << setprecision(2) << setw(6) << imageSlopes[a][b].direction << '\t';
+            }
+            cout << endl;
+        }
+
+        edgePixel testEdgePixel = {11, 6, 13, 10, 12, 14, 'r'};
+        auto testImage = new edgePixel*[5];
+        for (int a = 0; a <  5; a++){
+            testImage[a] = new edgePixel[5];
+            for (int b = 0; b < 5; b++){
+                testImage[a][b] = testEdgePixel;
+            }
+        }
+
+        e.maxMagnitudeGradient(testEdgePixel);
+        cout << testEdgePixel.maxMag << endl;
+        cout << testEdgePixel.maxAngle << endl;
+        e.maxMagnitudeGradient(testImage, 5, 5);
+        cout << testImage[0][0].maxMag << endl;
+        cout << testImage[0][0].maxAngle << endl;
 
     } catch (string& e){
         cout << e;
