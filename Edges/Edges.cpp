@@ -39,6 +39,23 @@ Edges::Edges(int s) {
     int KyList[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
     Kx = Matrix<int>(3, 3, KxList);
     Ky = Matrix<int>(3, 3, KyList);
+
+    threshold_lower = 20;       //random value
+}
+
+Edges::Edges(int s, double t) {
+    if (s % 2 != 1){
+        cout << "The size of the kernel should be an odd number.\n";
+    }
+    size = s;
+    k = (s - 1) / 2;
+    //matrix is an array of pointers
+    gaussianMatrix = Matrix<double>(s, s);
+    int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    int KyList[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+    Kx = Matrix<int>(3, 3, KxList);
+    Ky = Matrix<int>(3, 3, KyList);
+    threshold_lower = t;
 }
 
 /**
@@ -95,15 +112,22 @@ void Edges::gaussianBlur(Matrix<uint8_t> &image) {
 /**
  * Performs non-maxima suppression on the portion of the image given, indicated by r and c.
  * @param image : The array of slopes and magnitudes of the image (2D slope array)
- * @param r : the row of the pixel being considered
- * @param c : the col of the pixel being considered
+ * @param r : number of rows in the image
+ * @param c : number of cols in the image
+ * @param i : the degree of expansion applied to the image
  */
-void Edges::nonMaximumSuppression(slope** image, int r, int c) {
-    int plusDelta[4][2] = {{1,0}, {1,1}, {0,1}, {-1,1}};
-    int minDelta[4][2] = {{-1,0}, {-1,-1}, {0,-1}, {1,-1}};
+void Edges::nonMaximumSuppression(edgePixel** image, int r, int c, int i) {
+    bool maxPixels[r-i-i][c-i-i];
 
-    double t = abs(image[r][c].direction + 11.25);
-    int direction = round(t / 22.5);
+    for (int a = i; a < r - i; a++){
+        for (int b = i; b < c - i; b++){
+            maxPixels[a - i][b - i] = isLocalMax(image, a, b, threshold_lower);
+            if (!maxPixels[a - i][b - i]) {      //if the pixel is not a maximum, set it to zero.
+                image[a][b].maxMag = 0;
+            }   //if the pixel IS a local maximum, let it keep its magnitude.
+        }
+    }
+
 }
 
 /**
@@ -120,6 +144,56 @@ slope Edges::sobelPixel(Mat &image, int r, int c) {
     sig  = getSector(sig);
 //    double sig = getOrientationSector(Ix, Iy);
     return {G, sig};
+}
+
+/**
+ * Takes the combined magnitude and direction data for all the channels after it has been combined into one (in my case,
+ * finding the biggest magnitude of the three channels and using that one's data), the position of the pixel we want to
+ * look at, the direction of that pixel and the lower threshold that we use to determine eligibility for being an edge
+ * pixel. Returns true if the pixel is a local maximum.
+ * @param image : 2D array of edgePixel structs, containing the gradient data for all the channels of the image.
+ * @param u : the row of the pixel we're checking
+ * @param v : the col of the pixel we're checking
+ * @param direction : the direction (0, 1, 2 or 3) of the gradient at that pixel
+ * @param threshold_low : the lower threshold for eligibility of a local max.
+ * @return True is the pixel is a local maximum, False otherwise.
+ */
+bool Edges::isLocalMax(edgePixel **image, int u, int v, double threshold_low) {
+    double centerPixel = image[u][v].maxMag;            //center pixel, use its magnitude
+    if (centerPixel < threshold_low){
+        return false;
+    } else {
+        double lPixel;
+        double rPixel;
+        char direction = image[u][v].maxAngle;
+        switch (direction) {
+            case 0:
+                lPixel = image[u][v - 1].maxMag;
+                rPixel = image[u][v + 1].maxMag;
+                break;
+            case 1:
+                lPixel = image[u - 1][v - 1].maxMag;
+                rPixel = image[u + 1][v + 1].maxMag;
+                break;
+            case 2:
+                lPixel = image[u - 1][v].maxMag;
+                rPixel = image[u + 1][v].maxMag;
+                break;
+            case 3:
+                lPixel = image[u - 1][v + 1].maxMag;
+                rPixel = image[u + 1][v - 1].maxMag;
+                break;
+            default:
+                string e = "Invalid direction given.\n";
+                throw e;
+        }
+
+        if ((centerPixel >= lPixel) && (centerPixel >= rPixel)){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 /**
@@ -168,7 +242,6 @@ int Edges::getSector(double angle){
     } else {
         return 1;
     }
-    return -1;
 }
 
 /**
@@ -218,21 +291,17 @@ void Edges::maxMagnitudeGradient(edgePixel** image, int r, int c) {
 void Edges::maxMagnitudeGradient(edgePixel& p) {
     if (p.Rmag >= p.Bmag){
         if (p.Rmag >= p.Gmag){
-            p.max = 'R';
             p.maxMag = p.Rmag;
             p.maxAngle = p.Rdir;
         } else {
-            p.max = 'G';
             p.maxMag = p.Gmag;
             p.maxAngle = p.Gdir;
         }
     } else {
         if (p.Bmag >= p.Gmag){
-            p.max = 'B';
             p.maxMag = p.Bmag;
             p.maxAngle = p.Bdir;
         } else {
-            p.max = 'G';
             p.maxMag = p.Gmag;
             p.maxAngle = p.Gdir;
         }
@@ -283,6 +352,23 @@ Matrix<uint8_t> *Edges::toMatrix(Mat &image) {
     }
 
     return imageChannel;
+}
+
+edgePixel **Edges::slopesToEdges(slope** red, slope** green, slope** blue, int r, int c) {
+    auto output = new edgePixel*[r];
+    for (int a = 0; a < r; a++){
+        output[a] = new edgePixel[c];
+        for (int b = 0; b < c; b++){
+            output[a][b] = {red[a][b].magnitude,
+                            red[a][b].direction,
+                            green[a][b].magnitude,
+                            green[a][b].direction,
+                            blue[a][b].magnitude,
+                            blue[a][b].direction};
+        }
+    }
+
+    return output;
 }
 
 /**

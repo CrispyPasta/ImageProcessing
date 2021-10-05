@@ -24,9 +24,9 @@ struct edgePixel{
     double Gdir;
     double Bmag;
     double Bdir;
-    char max;
     double maxMag;
     double maxAngle;
+    char direction;
 };
 
 #endif //IMAGEPROCESSING_UTILITY_H

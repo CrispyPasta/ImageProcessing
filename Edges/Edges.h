@@ -28,11 +28,14 @@ public:
     int size;
     int k;
     double gaussianTotal;
+    double threshold_lower;
     Matrix<double> gaussianMatrix;
 
     Edges();
 
     Edges(int s);
+
+    Edges(int s, double t_low);
 
     void generateGaussian(double sig = 1.4142135624);
 
@@ -40,7 +43,9 @@ public:
 
     slope sobelPixel(Mat& image, int r, int c);
 
-    void nonMaximumSuppression(slope** image, int r, int c);
+    void nonMaximumSuppression(edgePixel** image, int r, int c, int i);
+
+    bool isLocalMax(edgePixel** image, int u, int v, double threshold_low);
 
     int getSector(double angle);
 
@@ -57,6 +62,10 @@ public:
     static Matrix<uint8_t>* getGreen(Mat& image);
 
     static Matrix<uint8_t>* toMatrix(Mat& image);
+
+    edgePixel** slopesToEdges(slope** red, slope** green, slope** blue, int r, int c);
+
+    void traceAndThreshold
 
     void print(std::string caption, int s = 5);
 

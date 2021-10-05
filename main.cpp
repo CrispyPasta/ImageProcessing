@@ -239,17 +239,26 @@ void testEdgeDetection(){
 
         for (int a = 0; a < snepPicture.rows - 1; a++){
             for (int b = 0; b < snepPicture.cols - 1; b++){
-//                cout << "G=" << imageSlopes[a][b].magnitude << '\t';
-                cout << "θ = " << setprecision(2) << setw(6) << imageSlopes[a][b].direction << '\t';
+                cout << "G = " << setprecision(2) << setw(6) << imageSlopes[a][b].magnitude << '\t';
+//                cout << "θ = " << setprecision(2) << setw(6) << imageSlopes[a][b].direction << '\t';
             }
             cout << endl;
         }
 
-        edgePixel testEdgePixel = {11, 6, 13, 10, 12, 14, 'r'};
+        edgePixel** edgeTester = e.slopesToEdges(imageSlopes, imageSlopes, imageSlopes, snepPicture.rows, snepPicture.cols);
+
+        srand(time(0));
+        edgePixel testEdgePixel = {11, 3, 13, 2, 12, 1, 'r'};
         auto testImage = new edgePixel*[5];
         for (int a = 0; a <  5; a++){
             testImage[a] = new edgePixel[5];
             for (int b = 0; b < 5; b++){
+                double tmp = rand() % 255;
+                double tmp1 = rand() % 255;
+                double tmp2 = rand() % 255;
+                testEdgePixel.Rmag = tmp;
+                testEdgePixel.Gmag = tmp1;
+                testEdgePixel.Bmag = tmp2;
                 testImage[a][b] = testEdgePixel;
             }
         }
@@ -260,6 +269,8 @@ void testEdgeDetection(){
         e.maxMagnitudeGradient(testImage, 5, 5);
         cout << testImage[0][0].maxMag << endl;
         cout << testImage[0][0].maxAngle << endl;
+
+        e.nonMaximumSuppression(testImage, 5, 5, 1);
 
     } catch (string& e){
         cout << e;
