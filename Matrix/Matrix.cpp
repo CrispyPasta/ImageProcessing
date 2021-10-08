@@ -1,6 +1,3 @@
-//
-// Created by fouri on 2021/08/22.
-//
 #include <iostream>
 #include <iomanip>
 #include "Matrix.h"
@@ -12,25 +9,6 @@ Matrix<T>::Matrix() {
     *this = Matrix(3, 3, 0.0);
 }
 
-//template<class T>
-//Matrix<T>::Matrix(int Rows, int Cols, double* data){
-//    rows = Rows;
-//    cols = Cols;
-//    mat = new double*[rows];
-//    for (int a = 0; a < rows; a++){
-//        mat[a] = new double[cols];
-//    } //don't doubt this my boy
-//
-//    int i = 0;  //counter to iterate through the data
-//    for (int a = 0; a < Rows; a++){
-//        for (int b = 0; b < Cols; b++){
-//            if (i >= Rows * Cols){
-//                mat[a][b] = 0;
-//            } else {
-//                mat[a][b] = data[i++];
-//            }
-//        }
-//    }
 //}
 
 template<class T>
@@ -186,26 +164,29 @@ double Matrix<T>::convolve(Matrix &m1, cv::Mat &image, int r, int c, char chan) 
  * @return Double result of the calculation.
  */
  template<class T>
-double Matrix<T>::convolve(Matrix &m1, int r, int c, Matrix &m2, Matrix& out, double t) {
+double Matrix<T>::convolve(Matrix<int>& m1, int r, int c, Matrix<uint8_t>& m2, double t) {
     if (!(m2.cols > m1.cols) || !(m2.rows > m1.rows)){
         string error = "* * * * * * * ERROR * * * * * * *\n";
         error += "The image matrix must be larger than the kernel.\n";
         throw error;
     }
 
-    double result = 0.0;
-    int m = m1.rows;
-    int n = m;  //if the matrices have equal dimensions, then gaussianMatrix = n
+    try{
+        double result = 0.0;
+        int m = m1.rows;
+        int n = m;  //if the matrices have equal dimensions, then gaussianMatrix = n
 
-    for (int i = 0; i < m; i++){
-        for (int j = 0; j < n; j++){
-            result += m1.mat[m - i - 1][n - j - 1] * m2.mat[r + i][c + j];
+        for (int i = 0; i < m; i++){
+            for (int j = 0; j < n; j++){
+                result += m1.mat[m - i - 1][n - j - 1] * m2.mat[r + i][c + j];
+            }
         }
+
+        return result / t;
+    } catch (...){
+        string e = "An error occurred in the convolve function.\n";
+        throw e;
     }
-
-    out.mat[r][c] = result / t;
-
-    return result / t;
 }
 
 template<class T>

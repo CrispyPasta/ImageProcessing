@@ -28,7 +28,7 @@ public:
 
     Matrix(int Rows, int Cols, T* data);
 
-    Matrix(int Rows, int Cols, T i = 0.0);
+    Matrix(int Rows, int Cols, T i = 0);
 
     Matrix(const Matrix& copy);
 
@@ -36,7 +36,7 @@ public:
 
     static double convolve(Matrix& m1, cv::Mat& image, int r, int c, char chan);
 
-    static double convolve(Matrix& m1, int r, int c, Matrix& m2, Matrix& out, double t);
+    static double convolve(Matrix<int>& m1, int r, int c, Matrix<uint8_t>& m2, double t);
 
     static double convolve(Matrix<double>& m1, int r, int c, Matrix<uint8_t>& m2, Matrix<uint8_t>& out, double t);
 

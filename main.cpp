@@ -43,6 +43,24 @@ bool saveColor(string name, Matrix<uint8_t>& red, Matrix<uint8_t>& green, Matrix
     }
 }
 
+void printEdges(edgePixel** e, int r, int c){
+    for (int a = 0; a < r; a++){
+        for (int b = 0; b < c; b++){
+            cout << "G=" << setw(4) << setprecision(3) << e[a][b].maxMag << '\t';
+        }
+        cout << endl;
+    }
+}
+void printSlopes(slope** e, int r, int c){
+    for (int a = 0; a < r; a++){
+        for (int b = 0; b < c; b++){
+            cout << "G=" << setw(4) << setprecision(3) << e[a][b].magnitude << '\t';
+        }
+        cout << endl;
+    }
+}
+// * * * * * * *  * * * * *  * * * * * * private utility functions
+
 void readImage(){
     cout << "\n\n * * * * * IMAGES * * * * * \n";
     try {
@@ -187,95 +205,192 @@ void testMixingFunctions(){
 
 void testEdgeDetection(){
     cout << "\n\n * * * * * EDGES * * * * * \n";
+    // try{
+    //     Edges e(7, 100);
+    //     e.print("Before");
+
+    //     e.generateGaussian(sqrt(2));
+
+    //     e.print("After", 5);
+
+    //     e.gaussianMatrix.expandMatrix(2);
+    //     e.gaussianMatrix.print("Expanded matrix", 5, 2);
+
+    //     Matrix<uint8_t> image(15, 15, 1);
+    //     Matrix<uint8_t> kernel(3, 3, 2);
+    //     Matrix<uint8_t> blurredImage(15, 15);
+
+    //     double d = Matrix<uint8_t>::convolve(kernel, 0, 0, image, blurredImage, 1);
+    //     cout << d << endl;
+
+    //     Edges f(5);
+    //     f.generateGaussian(sqrt(2));
+    //     Matrix<uint8_t> gaussianStandIn(5, 5, 1);
+
+    //     f.gaussianBlur(image);
+    //     image.print("Blurred:");
+
+    //     string image_path = path + "Images/tinier.jpg";
+    //     Mat snepPicture = imread(image_path, IMREAD_GRAYSCALE);
+
+    //     if (snepPicture.empty()){
+    //         cout << "Image not loaded\n";
+    //         return;
+    //     }
+    //     cout << "Image loaded!\n";
+    //     cout << snepPicture;
+
+    //     auto sobel = e.sobelPixel(snepPicture, 0, 0);
+    //     cout << endl << sobel.magnitude << endl;
+    //     cout << sobel.direction << endl;
+
+    //     auto imageMat = Edges::toMatrix(snepPicture);
+    //     imageMat->expandMatrix(1);
+    //     Mat expandedImage = *(imageMat->toMat());
+
+    //     slope** imageSlopes = new slope*[snepPicture.rows];
+    //     for (int a = 0; a < snepPicture.rows; a++){
+    //         imageSlopes[a] = new slope[snepPicture.cols];
+    //     }
+
+    //     e.sobelImage(expandedImage, imageSlopes, 1);
+
+    //     for (int a = 0; a < snepPicture.rows - 1; a++){
+    //         for (int b = 0; b < snepPicture.cols - 1; b++){
+    //             cout << "G = " << setprecision(2) << setw(6) << imageSlopes[a][b].magnitude << '\t';
+    //             cout << "θ = " << setprecision(2) << setw(6) << imageSlopes[a][b].direction << '\t';
+    //         }
+    //         cout << endl;
+    //     }
+
+    //     edgePixel** edgeTester = e.slopesToEdges(imageSlopes, imageSlopes, imageSlopes, snepPicture.rows, snepPicture.cols);
+
+    //     srand(time(0));
+    //     edgePixel testEdgePixel = {11, 3, 13, 2, 12, 1, 'r'};
+    //     auto testImage = new edgePixel*[5];
+    //     for (int a = 0; a <  5; a++){
+    //         testImage[a] = new edgePixel[5];
+    //         for (int b = 0; b < 5; b++){
+    //             double tmp = rand() % 255;
+    //             double tmp1 = rand() % 255;
+    //             double tmp2 = rand() % 255;
+    //             testEdgePixel.Rmag = tmp;
+    //             testEdgePixel.Gmag = tmp1;
+    //             testEdgePixel.Bmag = tmp2;
+    //             testImage[a][b] = testEdgePixel;
+    //         }
+    //     }
+
+    //     e.maxMagnitudeGradient(testEdgePixel);
+    //     cout << testEdgePixel.maxMag << endl;
+    //     cout << testEdgePixel.maxAngle << endl;
+    //     e.maxMagnitudeGradient(testImage, 5, 5);
+    //     cout << testImage[0][0].maxMag << endl;
+    //     cout << testImage[0][0].maxAngle << endl;
+
+    //     e.nonMaximumSuppression(testImage, 5, 5, 1);
+
+    //     Matrix<uint8_t> outputImage(5, 5);
+
+    //     for (int a  = 0; a < 5; a++){
+    //         for (int b = 0; b < 5; b++){
+    //             e.traceAndThreshold(testImage, outputImage, a, b, 5, 5);
+    //         }
+    //     }
+
+    //     outputImage.print("Output");
+
+    // } catch (string& e){
+    //     cout << e;
+    // }
+    cout << "\n * * * * * EDGES * * * * * \n";
+}
+
+void Canny(){
     try{
-        Edges e(7);
-        e.print("Before");
+        //step 0: prep the gaussian matrix and the lower threshold
+        Edges e(5, 10);
+        e.generateGaussian();
 
-        e.generateGaussian(sqrt(2));
-
-        e.print("After", 5);
-
-        e.gaussianMatrix.expandMatrix(2);
-        e.gaussianMatrix.print("Expanded matrix", 5, 2);
-
-        Matrix<uint8_t> image(15, 15, 1);
-        Matrix<uint8_t> kernel(3, 3, 2);
-        Matrix<uint8_t> blurredImage(15, 15);
-
-        double d = Matrix<uint8_t>::convolve(kernel, 0, 0, image, blurredImage, 1);
-        cout << d << endl;
-
-        Edges f(5);
-        f.generateGaussian(sqrt(2));
-        Matrix<uint8_t> gaussianStandIn(5, 5, 1);
-
-        f.gaussianBlur(image);
-        image.print("Blurred:");
-
-        string image_path = path + "Images/tinier.jpg";
-        Mat snepPicture = imread(image_path, IMREAD_GRAYSCALE);
+        //step 1: load the picture
+        string image_path = path + "Images/snep.jpg";
+        Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
         if (snepPicture.empty()){
             cout << "Image not loaded\n";
             return;
         }
         cout << "Image loaded!\n";
-        cout << snepPicture;
+//        cout << snepPicture;
 
-        auto sobel = e.sobelPixel(snepPicture, 0, 0);
-        cout << endl << sobel.magnitude << endl;
-        cout << sobel.direction << endl;
+        //step 2: split it into three channels
+        Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
+        Matrix<uint8_t>* blueImage = Edges::getBlue(snepPicture);
+        Matrix<uint8_t>* greenImage = Edges::getGreen(snepPicture);
 
-        auto imageMat = Edges::toMatrix(snepPicture);
-        imageMat->expandMatrix(1);
-        Mat expandedImage = *(imageMat->toMat());
+        //step 3: expand the matrices
+        cout << "\nOriginal rows: " << redImage->rows << endl;
+        cout << "Original cols: " << redImage->cols << endl;
+        redImage->expandMatrix(1);
+        blueImage->expandMatrix(1);
+        greenImage->expandMatrix(1);
+        cout << "Expanded rows: " << redImage->rows << endl;
+        cout << "Expanded cols: " << redImage->cols << endl;
 
-        slope** imageSlopes = new slope*[snepPicture.rows];
+        //step 4: Gaussian blur all of them
+        cout << "Blurring channels.\n";
+        e.gaussianBlur(*redImage);
+        e.gaussianBlur(*blueImage);
+        e.gaussianBlur(*greenImage);
+        cout << "Blurring finished.\n";
+
+        //step 5: Apply sobel to all the blurred matrices
+        slope** redSlopes = new slope*[snepPicture.rows];
+        slope** blueSlopes = new slope*[snepPicture.rows];
+        slope** greenSlopes = new slope*[snepPicture.rows];
         for (int a = 0; a < snepPicture.rows; a++){
-            imageSlopes[a] = new slope[snepPicture.cols];
+            redSlopes[a] = new slope[snepPicture.cols];
+            blueSlopes[a] = new slope[snepPicture.cols];
+            greenSlopes[a] = new slope[snepPicture.cols];
         }
 
-        e.sobelImage(expandedImage, imageSlopes, 1);
+        e.sobelImage(*redImage, redSlopes);
+        e.sobelImage(*blueImage, blueSlopes);
+        e.sobelImage(*greenImage, greenSlopes);
 
-        for (int a = 0; a < snepPicture.rows - 1; a++){
-            for (int b = 0; b < snepPicture.cols - 1; b++){
-                cout << "G = " << setprecision(2) << setw(6) << imageSlopes[a][b].magnitude << '\t';
-//                cout << "θ = " << setprecision(2) << setw(6) << imageSlopes[a][b].direction << '\t';
-            }
-            cout << endl;
-        }
+//        printSlopes(redSlopes, snepPicture.rows, snepPicture.cols);
+//        printSlopes(blueSlopes, snepPicture.rows, snepPicture.cols);
+//        printSlopes(greenSlopes, snepPicture.rows, snepPicture.cols);
+        cout << "Calculated sobel for each channel.\n";
 
-        edgePixel** edgeTester = e.slopesToEdges(imageSlopes, imageSlopes, imageSlopes, snepPicture.rows, snepPicture.cols);
+        //step 6: Combine the three channels back into one
+        edgePixel** combinedSlopes = e.slopesToEdges(redSlopes, blueSlopes, greenSlopes, snepPicture.rows, snepPicture.cols);
+//        printEdges(combinedSlopes, snepPicture.rows, snepPicture.cols);
+        cout << "Combined slopes into edgePixel array.\n";
 
-        srand(time(0));
-        edgePixel testEdgePixel = {11, 3, 13, 2, 12, 1, 'r'};
-        auto testImage = new edgePixel*[5];
-        for (int a = 0; a <  5; a++){
-            testImage[a] = new edgePixel[5];
-            for (int b = 0; b < 5; b++){
-                double tmp = rand() % 255;
-                double tmp1 = rand() % 255;
-                double tmp2 = rand() % 255;
-                testEdgePixel.Rmag = tmp;
-                testEdgePixel.Gmag = tmp1;
-                testEdgePixel.Bmag = tmp2;
-                testImage[a][b] = testEdgePixel;
-            }
-        }
+        //step 7: Do nonmaximum suppression
+        e.maxMagnitudeGradient(combinedSlopes, snepPicture.rows, snepPicture.cols);
+        Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
+        cout << endl;
+//        e.isLocalMax(combinedSlopes, 1, 1);
+        e.nonMaximumSuppression(combinedSlopes, snepPicture.rows, snepPicture.cols);
+//        Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
+        cout << "Non maximum suppression finished.\n";
 
-        e.maxMagnitudeGradient(testEdgePixel);
-        cout << testEdgePixel.maxMag << endl;
-        cout << testEdgePixel.maxAngle << endl;
-        e.maxMagnitudeGradient(testImage, 5, 5);
-        cout << testImage[0][0].maxMag << endl;
-        cout << testImage[0][0].maxAngle << endl;
+        //step 8: trace and threshold
+        Matrix<uint8_t> outputBoi(snepPicture.rows, snepPicture.cols, static_cast<char>(0));
+        e.traceEdges(combinedSlopes, outputBoi, snepPicture.rows, snepPicture.cols);
+        cout << "Tracing and thresholding is done.\n";
 
-        e.nonMaximumSuppression(testImage, 5, 5, 1);
+        //step 9: save the output
+//        outputBoi.print("Output");
+        saveGreyscale("edgeOutput", outputBoi);
 
-    } catch (string& e){
+        cout << "Done.\n";
+    } catch (string e) {
         cout << e;
+        return;
     }
-    cout << "\n * * * * * EDGES * * * * * \n";
 }
 
 int main() {
@@ -285,11 +400,11 @@ int main() {
 //    testMatrixFunctions();
 //    testColorConversion();
 //    testMixingFunctions();
-    testEdgeDetection();
-
+//    testEdgeDetection();
+    Canny();
     auto end = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(end-start);
+    auto duration = duration_cast<microseconds>(end-start);
     cout << "Execution complete\n";
-    cout << "Time to execute: " << duration.count() << " milliseconds.\n";
+    cout << "Time to execute: " << duration.count() << " microseconds.\n";
     return 0;
 }

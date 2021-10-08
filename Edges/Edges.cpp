@@ -15,6 +15,7 @@ using namespace std;
 Edges::Edges() {
     size = 7;
     k = 3;
+    pp = 0;
     gaussianMatrix = Matrix<double>(size, size);
 
     int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
@@ -49,6 +50,7 @@ Edges::Edges(int s, double t) {
     }
     size = s;
     k = (s - 1) / 2;
+    pp = 0;
     //matrix is an array of pointers
     gaussianMatrix = Matrix<double>(s, s);
     int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
@@ -72,18 +74,20 @@ void Edges::generateGaussian(double sig) {
     double a;   //temp value 1
     double b;   //temp value 2
     double norm = 1.0 / (2.0 * M_PI * sigma * sigma);
-    norm = 90;
+    norm *= 91;
     double d = 2.0 * sigma * sigma;
 
     for (int i = 1; i <= (2*k + 1); i++){
         a = pow(i - (k + 1), 2);
         for (int j = 1; j <= (2*k + 1); j++){
-            b = pow(j - (k + 1), 2);    //dont doubt the intervals or the values for a and b, they make sense.
-            gaussianMatrix.mat[i - 1][j - 1] = round(norm * exp(-((a + b) / d)));
-            gaussianTotal += round(norm * exp(-((a + b) / d)));
-//            gaussianMatrix.mat[i - 1][j - 1] = norm * exp(-((a + b) / d));
+            b = pow(j - (k + 1), 2);    //don't doubt the intervals or the values for a and b, they make sense.
+            gaussianMatrix.mat[i - 1][j - 1] = (norm * exp(-((a + b) / d)));
+            gaussianTotal += (norm * exp(-((a + b) / d)));
+            // gaussianMatrix.mat[i - 1][j - 1] = norm * exp(-((a + b) / d));
         }
     }
+
+    gaussianMatrix.print("Gaussian generated:", 5);
 }
 
 /**
@@ -96,7 +100,7 @@ void Edges::gaussianBlur(Matrix<uint8_t> &image) {
     Matrix<uint8_t>* blurredImage = new Matrix<uint8_t>(image.rows, image.cols);
     image.expandMatrix(k);      //expand the image
 
-    double d;
+//    double d;         //convolve the image with the gaussian and store the blurred data in blurredImage
     for (int a = 0; a < rows; a++){
         for (int b = 0; b < cols; b++){
             Matrix<uint8_t>::convolve(gaussianMatrix, a, b, image, *blurredImage, gaussianTotal);
@@ -114,15 +118,14 @@ void Edges::gaussianBlur(Matrix<uint8_t> &image) {
  * @param image : The array of slopes and magnitudes of the image (2D slope array)
  * @param r : number of rows in the image
  * @param c : number of cols in the image
- * @param i : the degree of expansion applied to the image
  */
-void Edges::nonMaximumSuppression(edgePixel** image, int r, int c, int i) {
-    bool maxPixels[r-i-i][c-i-i];
+void Edges::nonMaximumSuppression(edgePixel** image, int r, int c) {
+    bool maxPixels[r-1-1][c-1-1];
 
-    for (int a = i; a < r - i; a++){
-        for (int b = i; b < c - i; b++){
-            maxPixels[a - i][b - i] = isLocalMax(image, a, b, threshold_lower);
-            if (!maxPixels[a - i][b - i]) {      //if the pixel is not a maximum, set it to zero.
+    for (int a = 1; a < r - 1; a++){
+        for (int b = 1; b < c - 1; b++){
+            maxPixels[a - 1][b - 1] = isLocalMax(image, a, b);
+            if (!maxPixels[a - 1][b - 1]) {      //if the pixel is not a maximum, set it to zero.
                 image[a][b].maxMag = 0;
             }   //if the pixel IS a local maximum, let it keep its magnitude.
         }
@@ -135,14 +138,14 @@ void Edges::nonMaximumSuppression(edgePixel** image, int r, int c, int i) {
  * @param image : The portion of the image for which the Sobel operation must be used.
  * @return : A slope struct containing the magnitude and direction of the slope at that point.
  */
-slope Edges::sobelPixel(Mat &image, int r, int c) {
-    int Ix = round(Matrix<int>::convolve(Kx, image, r, c, 'n') / 8.0);     //convolve and normalize
-    int Iy = round(Matrix<int>::convolve(Ky, image, r, c, 'n') / 8.0);
+slope Edges::sobelPixel(Matrix<uint8_t>& image, int r, int c) {
+    int Ix = round(Matrix<int>::convolve(Kx, r, c, image, 8.0));     //convolve and normalize
+    int Iy = round(Matrix<int>::convolve(Ky, r, c, image, 8.0));
 
     double G = sqrt(Ix * Ix + Iy * Iy);
     double sig = atan2(Iy, Ix) * 57.29577951;        //convert to degrees
     sig  = getSector(sig);
-//    double sig = getOrientationSector(Ix, Iy);
+    // double sig = getOrientationSector(Ix, Iy);
     return {G, sig};
 }
 
@@ -158,9 +161,17 @@ slope Edges::sobelPixel(Mat &image, int r, int c) {
  * @param threshold_low : the lower threshold for eligibility of a local max.
  * @return True is the pixel is a local maximum, False otherwise.
  */
-bool Edges::isLocalMax(edgePixel **image, int u, int v, double threshold_low) {
+bool Edges::isLocalMax(edgePixel **image, int u, int v) {
     double centerPixel = image[u][v].maxMag;            //center pixel, use its magnitude
-    if (centerPixel < threshold_low){
+
+    if (pp == 0){
+        cout << "Non max suppression is underway\n";
+//        Utility::print(image, 12, 14);
+//        cout << "Non max suppression is underway\n\n";
+    }
+    pp++;
+
+    if (centerPixel < threshold_lower){
         return false;
     } else {
         double lPixel;
@@ -249,17 +260,15 @@ int Edges::getSector(double angle){
  * one pixel, the p parameter lets you set the position where the function starts calculating the slope.
  * @param image : The mat image object.
  * @param output : A 2D array of slope structs
- * @param p : How many pixels were added to the image when it was expanded.
  */
-void Edges::sobelImage(Mat &image, slope **output, int p) {
+void Edges::sobelImage(Matrix<uint8_t>& image, slope **output) {
     try{
         int rows = image.rows;
         int cols = image.cols;
-        int offset = p - 1;
 
-        for (int a = 0; a < rows - p - p; a++){
-            for (int b = 0; b < cols - p - p; b++){
-                output[a][b] = sobelPixel(image, a + offset, b + offset);
+        for (int a = 0; a < rows - 2; a++){    //the sobel matrix is 3x3, so don't do sobelPixel on the very edge pixels
+            for (int b = 0; b < cols - 2; b++){
+                output[a][b] = sobelPixel(image, a, b);
             }
         }
     } catch (...) {
@@ -359,16 +368,53 @@ edgePixel **Edges::slopesToEdges(slope** red, slope** green, slope** blue, int r
     for (int a = 0; a < r; a++){
         output[a] = new edgePixel[c];
         for (int b = 0; b < c; b++){
-            output[a][b] = {red[a][b].magnitude,
-                            red[a][b].direction,
-                            green[a][b].magnitude,
-                            green[a][b].direction,
-                            blue[a][b].magnitude,
-                            blue[a][b].direction};
+            output[a][b] = {red[a][b].magnitude, red[a][b].direction,
+                            green[a][b].magnitude, green[a][b].direction,
+                            blue[a][b].magnitude, blue[a][b].direction};
+
+//            Utility::print(output[a][b]);
+//            cout << endl;
         }
     }
-
+//    Utility::print(output, r, c);
     return output;
+}
+
+/**
+ * Performs the trace and threshold step for edge detection. Takes the input matrix (which comes from the non maximum
+ * suppression function), a new output matrix (initialized to all zeros) and some ints. Choose a starting point (r, c)
+ * and give the size of the input matrix using N and M.
+ * @param input : 2D array of edgePixel structs, should come from nonMaxSuppression step.
+ * @param output : 2D array of uint8_t, initialized to all zeros. This is the final output of edge detection.
+ * @param r : Starting row for this step
+ * @param c : Starting col for this step
+ * @param N : Number of rows in the input matrix
+ * @param M : Number of cols in the input matrix.
+ */
+void Edges::traceAndThreshold(edgePixel **input, Matrix<uint8_t>& output, int r, int c, int N, int M) {
+    int cLeft = max(c - 1, 0);
+    int cRight = min(c + 1, M - 1);
+    int rTop = max(r - 1, 0);
+    int rBtm = min(r + 1, N - 1);
+
+    for (int a = rTop; a <= rBtm; a++){
+        for (int b = cLeft; b <= cRight; b++){
+            double tmp = input[a][b].maxMag;
+            if ((input[a][b].maxMag >= threshold_lower) && (output.mat[a][b] == 0)){
+//                cout << "recursing. R = " << r << ", " << c << endl;
+                output.mat[r][c] = 255;
+                traceAndThreshold(input, output, a, b, N, M);
+            }
+        }
+    }
+}
+
+void Edges::traceEdges(edgePixel **input, Matrix<uint8_t>& output, int N, int M) {
+    for (int a = 1; a < N - 1; a++){
+        for (int b = 1; b < M - 1; b++){
+            this->traceAndThreshold(input, output, a, b, N, M);
+        }
+    }
 }
 
 /**

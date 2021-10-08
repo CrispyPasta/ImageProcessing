@@ -27,6 +27,7 @@ public:
     double sigma;
     int size;
     int k;
+    int pp;
     double gaussianTotal;
     double threshold_lower;
     Matrix<double> gaussianMatrix;
@@ -41,15 +42,15 @@ public:
 
     void gaussianBlur(Matrix<uint8_t>& image);
 
-    slope sobelPixel(Mat& image, int r, int c);
+    slope sobelPixel(Matrix<uint8_t>& image, int r, int c);
 
-    void nonMaximumSuppression(edgePixel** image, int r, int c, int i);
+    void nonMaximumSuppression(edgePixel** image, int r, int c);
 
-    bool isLocalMax(edgePixel** image, int u, int v, double threshold_low);
+    bool isLocalMax(edgePixel** image, int u, int v);
 
     int getSector(double angle);
 
-    void sobelImage(Mat& image, slope** output, int p);
+    void sobelImage(Matrix<uint8_t>& image, slope** output);
 
     static void maxMagnitudeGradient(edgePixel**, int r, int c);
 
@@ -65,7 +66,9 @@ public:
 
     edgePixel** slopesToEdges(slope** red, slope** green, slope** blue, int r, int c);
 
-    void traceAndThreshold
+    void traceAndThreshold(edgePixel** input,  Matrix<uint8_t>& output, int r, int c, int N, int M);
+
+    void traceEdges(edgePixel** input,  Matrix<uint8_t>& output, int N, int M);
 
     void print(std::string caption, int s = 5);
 
