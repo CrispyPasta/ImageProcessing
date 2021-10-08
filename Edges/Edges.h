@@ -7,12 +7,11 @@
 #include "../Matrix/Matrix.h"
 #include "../Utility/Utility.h"
 #include <opencv2/opencv.hpp>
-
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <string>
-#include <math.h>
+#include <cmath>
 using namespace cv;
 
 class Edges {
@@ -42,19 +41,25 @@ public:
 
     void gaussianBlur(Matrix<uint8_t>& image);
 
-    slope sobelPixel(Matrix<uint8_t>& image, int r, int c);
-
-    void nonMaximumSuppression(edgePixel** image, int r, int c);
-
-    bool isLocalMax(edgePixel** image, int u, int v);
-
     int getSector(double angle);
+
+    slope sobelPixel(Matrix<uint8_t>& image, int r, int c);
 
     void sobelImage(Matrix<uint8_t>& image, slope** output);
 
-    static void maxMagnitudeGradient(edgePixel**, int r, int c);
+    bool isLocalMax(edgePixel** image, int u, int v);
+
+    void nonMaximumSuppression(edgePixel** image, int r, int c);
 
     static void maxMagnitudeGradient(edgePixel& pixel);
+
+    static void maxMagnitudeGradient(edgePixel**, int r, int c);
+
+    void traceAndThreshold(edgePixel** input,  Matrix<uint8_t>& output, int r, int c, int N, int M);
+
+    void traceEdges(edgePixel** input,  Matrix<uint8_t>& output, int N, int M);
+
+    edgePixel** slopesToEdges(slope** red, slope** green, slope** blue, int r, int c);
 
     static Matrix<uint8_t>* getRed(Mat& image);
 
@@ -63,12 +68,6 @@ public:
     static Matrix<uint8_t>* getGreen(Mat& image);
 
     static Matrix<uint8_t>* toMatrix(Mat& image);
-
-    edgePixel** slopesToEdges(slope** red, slope** green, slope** blue, int r, int c);
-
-    void traceAndThreshold(edgePixel** input,  Matrix<uint8_t>& output, int r, int c, int N, int M);
-
-    void traceEdges(edgePixel** input,  Matrix<uint8_t>& output, int N, int M);
 
     void print(std::string caption, int s = 5);
 

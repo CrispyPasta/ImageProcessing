@@ -370,7 +370,7 @@ void Canny(){
 
         //step 7: Do nonmaximum suppression
         e.maxMagnitudeGradient(combinedSlopes, snepPicture.rows, snepPicture.cols);
-        Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
+//        Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
         cout << endl;
 //        e.isLocalMax(combinedSlopes, 1, 1);
         e.nonMaximumSuppression(combinedSlopes, snepPicture.rows, snepPicture.cols);
