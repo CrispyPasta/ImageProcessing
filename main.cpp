@@ -51,6 +51,7 @@ void printEdges(edgePixel** e, int r, int c){
         cout << endl;
     }
 }
+
 void printSlopes(slope** e, int r, int c){
     for (int a = 0; a < r; a++){
         for (int b = 0; b < c; b++){
@@ -146,8 +147,28 @@ void testMatrixFunctions(){
 void testColorConversion(){
     cout << "\n\n * * * * * COLOR CONVERSION * * * * * \n";
     try {
+        string image_path = path + "Images/photo.jpg";
+        Mat snepPicture = imread(image_path, IMREAD_COLOR);
+
+        if (snepPicture.empty()){
+            cout << "Image not loaded\n";
+            return;
+        }
+        cout << "Image loaded!\n";
+
+        Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
+        Matrix<uint8_t>* blueImage = Edges::getBlue(snepPicture);
+        Matrix<uint8_t>* greenImage = Edges::getGreen(snepPicture);
+
+        int imageRows = redImage->rows / 2;
+        int imageCols = redImage->cols / 2;
+        double r = redImage->mat[imageRows][imageCols];
+        double g = greenImage->mat[imageRows][imageCols];
+        double b = blueImage->mat[imageRows][imageCols];
+        double demoPixel[] = {r, g, b};
+
        double rgbList[] = {31, 49, 242};
-       Matrix<double> RGB(3, 1, rgbList);
+       Matrix<double> RGB(3, 1, demoPixel);
 
        RGB.print("RGB");
        Color::rgbtoXyz(RGB);
@@ -309,11 +330,11 @@ void testEdgeDetection(){
 void Canny(){
     try{
         //step 0: prep the gaussian matrix and the lower threshold
-        Edges e(5, 10);
+        Edges e(5, 12);
         e.generateGaussian();
 
         //step 1: load the picture
-        string image_path = path + "Images/snep.jpg";
+        string image_path = path + "Images/photo.jpg";
         Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
         if (snepPicture.empty()){
@@ -384,7 +405,7 @@ void Canny(){
 
         //step 9: save the output
 //        outputBoi.print("Output");
-        saveGreyscale("edgeOutput", outputBoi);
+        saveGreyscale("photoEdges2", outputBoi);
 
         cout << "Done.\n";
     } catch (string e) {
@@ -402,6 +423,7 @@ int main() {
 //    testMixingFunctions();
 //    testEdgeDetection();
     Canny();
+    testColorConversion();
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(end-start);
     cout << "Execution complete\n";
