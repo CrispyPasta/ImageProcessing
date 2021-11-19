@@ -168,26 +168,46 @@ void testColorConversion(){
         double demoPixel[] = {r * 1.0, g * 1.0, 1.0 * b};
         int intDemoPixel[] = {0, 255, 255};
 
-       double rgbList[] = {31, 49, 242};
-       Matrix<double> RGB(3, 1, demoPixel);
+        double rgbList[] = {31, 49, 242};
+        Matrix<double> RGB(3, 1, demoPixel);
 
-       RGB.print("RGB");
-       Color::rgbtoXyz(RGB);
-       RGB.print("XYZ");
-       Color::xyztoLab(RGB);
-       RGB.print("LAB");
+        RGB.print("RGB");
+        Color::rgbtoXyz(RGB);
+        RGB.print("XYZ");
+        Color::xyztoLab(RGB);
+        RGB.print("LAB");
 
-       int BGR2[] = {242, 85, 17};
-       Matrix<double>* RGB2matrix = Color::rgbtoLab(intDemoPixel);
+        int BGR2[] = {242, 85, 17};
+        Matrix<double>* RGB2matrix = Color::rgbtoLab(intDemoPixel);
 
-       double difference = Color::deltaE(RGB, *RGB2matrix);
-       cout << "Delta E = " << to_string(difference) << endl;
+        double difference = Color::deltaE(RGB, *RGB2matrix);
+        cout << "Delta E = " << to_string(difference) << endl;
 
-       cout << Color::classifyColor(*RGB2matrix);
+        cout << Color::classifyColor(*RGB2matrix);
     } catch (string& e) {
-       cout << e;
+        cout << e;
     }
     cout << "\n * * * * * COLOR CONVERSION * * * * * \n";
+}
+
+void averageColorClassification() {
+    string image_path = path + "Images/red.jpg";
+    Mat snepPicture = imread(image_path, IMREAD_COLOR);
+
+    if (snepPicture.empty()){
+        cout << "Image not loaded\n";
+        return;
+    }
+    cout << "Image loaded!\n";
+
+    Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
+    Matrix<uint8_t>* blueImage = Edges::getBlue(snepPicture);
+    Matrix<uint8_t>* greenImage = Edges::getGreen(snepPicture);
+
+    //make array of pixels
+    //convert them all to lab
+    //get average lab value
+    //classify that color
 }
 
 void testMixingFunctions(){

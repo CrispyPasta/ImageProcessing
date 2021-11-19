@@ -29,7 +29,7 @@ double Mixing::standardDeviation(Matrix<double> *pixels, int numPixels) {
 
 
 /**
- * Calculates the average Lab value for a given array of pixels.
+ * Calculates the average Lab value for a given array of Lab pixels.
  * @param pixels : An array of Matrix objects, each of the dimensions 3x1
  * @param numPixels : Number of elements in the array
  * @return : A pixel containing the average values for each channel: L, a, and b
