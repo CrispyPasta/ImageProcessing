@@ -11,15 +11,21 @@ using namespace cv;
 
 //* * * * * * * * * CLASSIFICATION COLORS * * * * * * * * *
 double red[3] = {48.97, 73.36, 58.26};
-double blue[3] = {30.17, 70.96, -98.40};
+double blue[3] = {26.92, 68.81, -91.14};
+double green[3] = {87.74, -86.18, 83.18};
+double yellow[3] = {97.14, -21.56, 94.48};
+double lightBlue[3] = {76.21, -28.32, -30.94};
 
 auto Blue = Matrix<double>(3, 1, blue);
 auto Red = Matrix<double>(3, 1, red);
+auto Green = Matrix<double>(3, 1, green);
+auto Yellow = Matrix<double>(3, 1, yellow);
+auto LightBlue = Matrix<double>(3, 1, lightBlue);
 
-Matrix<double> classificationColors[] = {Blue, Red};
+Matrix<double> classificationColors[] = {Blue, Red, Green, Yellow, LightBlue};
 
-std::string colorNames[] = {"Blue", "Red"};
-int numClassificationColors = 2;
+std::string colorNames[] = {"Dark Blue", "Red", "Green", "Yellow", "Light Blue"};
+int numClassificationColors = 5;
 //* * * * * * * * * CLASSIFICATION COLORS * * * * * * * * *
 
 
@@ -134,7 +140,7 @@ void Color::xyztoLab(Matrix<double>& xyz) {
  * update it until it is L*a*b*. Will decide whether it is desirable to return a matrix or an array later.
  * @param vector : A 3-element integer array containing the RGB value in the order B-G-R.
  */
-Matrix<double>* Color::rgbtoLab(int* vector) {
+Matrix<double>* Color::bgrtoLab(int* vector) {
     cout << "Converting from RGB to L*a*b*\n";
     double temp[3];
     temp[0] = vector[2];
@@ -199,6 +205,23 @@ string Color::classifyColor(Matrix<double> &val) {
     return colorNames[minPos];
 }
 
-Color::~Color() {
+Matrix<double>*  Color::bgrtoLab(bgrPixel *image, int numPixels) {
+    double temp[3];
+    Matrix<double>* labPixels = new Matrix<double>[numPixels];
 
+
+    for (int a = 0; a < numPixels; a++) {
+        auto labMat = new Matrix<double>(3, 1);
+        labMat->mat[0][0] = image[a].r;
+        labMat->mat[1][0] = image[a].g;
+        labMat->mat[2][0] = image[a].b;
+        rgbtoXyz(*labMat);
+        xyztoLab(*labMat);
+        labPixels[a] = *labMat;
+//        labMat->print();
+    }
+
+    return labPixels;
 }
+
+Color::~Color() = default;

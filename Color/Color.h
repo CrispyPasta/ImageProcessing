@@ -19,11 +19,13 @@ public:
 
     static void xyztoLab(Matrix<double>& xyz);
 
-    static Matrix<double>* rgbtoLab(int* image);
+    static Matrix<double>* bgrtoLab(int* image);
 
     static double deltaE(Matrix<double>& val1, Matrix<double>& val2);
 
     static std::string classifyColor(Matrix<double>& val);
+
+    static Matrix<double>* bgrtoLab(bgrPixel* image, int numPixels);
 };
 
 #endif //IMAGEPROCESSING_COLOR_H

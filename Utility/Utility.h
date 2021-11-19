@@ -6,7 +6,11 @@
 #define IMAGEPROCESSING_UTILITY_H
 #include "../Matrix/Matrix.h"
 #include <iomanip>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
 using namespace std;
+using namespace cv;
 
 
 struct slope{
@@ -18,6 +22,12 @@ struct LabPixel{
     double L;
     double a;
     double b;
+};
+
+struct bgrPixel{
+    uint8_t b;
+    uint8_t g;
+    uint8_t r;
 };
 
 struct edgePixel{
@@ -46,6 +56,25 @@ public:
             }
             cout << '\n';
         }
+    }
+
+    static bgrPixel* matToPixels(cv::Mat& image) {
+        auto outputArray = new bgrPixel[image.rows * image.cols];
+
+              //make a 2d Array of bgrPixels
+
+        Vec3b temp;
+
+        int total = 0;
+        for (int a = 0; a < image.rows; a++) {
+            for (int b = 0; b < image.cols; b++) {
+                temp = image.at<Vec3b>(a, b);
+                outputArray[total] = bgrPixel{temp.val[0], temp.val[1], temp.val[2]};
+                total++;
+            }
+        }
+
+        return outputArray;
     }
 };
 

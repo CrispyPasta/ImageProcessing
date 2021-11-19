@@ -178,7 +178,7 @@ void testColorConversion(){
         RGB.print("LAB");
 
         int BGR2[] = {242, 85, 17};
-        Matrix<double>* RGB2matrix = Color::rgbtoLab(intDemoPixel);
+        Matrix<double>* RGB2matrix = Color::bgrtoLab(intDemoPixel);
 
         double difference = Color::deltaE(RGB, *RGB2matrix);
         cout << "Delta E = " << to_string(difference) << endl;
@@ -191,23 +191,22 @@ void testColorConversion(){
 }
 
 void averageColorClassification() {
-    string image_path = path + "Images/red.jpg";
+    string image_path = path + "Images/darkblue.jpg";
     Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
     if (snepPicture.empty()){
         cout << "Image not loaded\n";
         return;
     }
-    cout << "Image loaded!\n";
 
-    Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
-    Matrix<uint8_t>* blueImage = Edges::getBlue(snepPicture);
-    Matrix<uint8_t>* greenImage = Edges::getGreen(snepPicture);
+    //    THIS SEQUENCE IS USED TO CLASSIFY THE AVERAGE COLOUR OF AN IMAGE
+    bgrPixel* t = Utility::matToPixels(snepPicture);
+    Matrix<double>* labPixels = Color::bgrtoLab(t, snepPicture.rows * snepPicture.cols);
+    Matrix<double>* averageValue = Mixing::averageLab(labPixels, snepPicture.rows * snepPicture.cols);
+    string color = Color::classifyColor(*averageValue);
+    cout << "The color is: " << color << "\n\n";
+    //    THIS SEQUENCE IS USED TO CLASSIFY THE AVERAGE COLOUR OF AN IMAGE
 
-    //make array of pixels
-    //convert them all to lab
-    //get average lab value
-    //classify that color
 }
 
 void testMixingFunctions(){
@@ -443,8 +442,9 @@ int main() {
 //    testColorConversion();
 //    testMixingFunctions();
 //    testEdgeDetection();
-    Canny();
-    testColorConversion();
+//    Canny();
+//    testColorConversion();
+    averageColorClassification();
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(end-start);
     cout << "Execution complete\n";
