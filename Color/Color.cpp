@@ -130,7 +130,7 @@ void Color::xyztoLab(Matrix<double>& xyz) {
 }
 
 /**
- * This function will take an RGB array (int) and convert it to L*a*b* values. It will create a matrix object and
+ * This function will take an BGR array (int) and convert it to L*a*b* values. It will create a matrix object and
  * update it until it is L*a*b*. Will decide whether it is desirable to return a matrix or an array later.
  * @param vector : A 3-element integer array containing the RGB value in the order B-G-R.
  */

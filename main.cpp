@@ -162,10 +162,11 @@ void testColorConversion(){
 
         int imageRows = redImage->rows / 2;
         int imageCols = redImage->cols / 2;
-        double r = redImage->mat[imageRows][imageCols];
-        double g = greenImage->mat[imageRows][imageCols];
-        double b = blueImage->mat[imageRows][imageCols];
-        double demoPixel[] = {r, g, b};
+        int r = redImage->mat[imageRows][imageCols];
+        int g = greenImage->mat[imageRows][imageCols];
+        int b = blueImage->mat[imageRows][imageCols];
+        double demoPixel[] = {r * 1.0, g * 1.0, 1.0 * b};
+        int intDemoPixel[] = {0, 255, 255};
 
        double rgbList[] = {31, 49, 242};
        Matrix<double> RGB(3, 1, demoPixel);
@@ -177,7 +178,7 @@ void testColorConversion(){
        RGB.print("LAB");
 
        int BGR2[] = {242, 85, 17};
-       Matrix<double>* RGB2matrix = Color::rgbtoLab(BGR2);
+       Matrix<double>* RGB2matrix = Color::rgbtoLab(intDemoPixel);
 
        double difference = Color::deltaE(RGB, *RGB2matrix);
        cout << "Delta E = " << to_string(difference) << endl;
@@ -334,7 +335,7 @@ void Canny(){
         e.generateGaussian();
 
         //step 1: load the picture
-        string image_path = path + "Images/photo.jpg";
+        string image_path = path + "Images/cropped.jpg";
         Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
         if (snepPicture.empty()){
@@ -342,7 +343,7 @@ void Canny(){
             return;
         }
         cout << "Image loaded!\n";
-//        cout << snepPicture;
+        //cout << snepPicture;
 
         //step 2: split it into three channels
         Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
@@ -379,23 +380,23 @@ void Canny(){
         e.sobelImage(*blueImage, blueSlopes);
         e.sobelImage(*greenImage, greenSlopes);
 
-//        printSlopes(redSlopes, snepPicture.rows, snepPicture.cols);
-//        printSlopes(blueSlopes, snepPicture.rows, snepPicture.cols);
-//        printSlopes(greenSlopes, snepPicture.rows, snepPicture.cols);
+        //printSlopes(redSlopes, snepPicture.rows, snepPicture.cols);
+        //printSlopes(blueSlopes, snepPicture.rows, snepPicture.cols);
+        //printSlopes(greenSlopes, snepPicture.rows, snepPicture.cols);
         cout << "Calculated sobel for each channel.\n";
 
         //step 6: Combine the three channels back into one
         edgePixel** combinedSlopes = e.slopesToEdges(redSlopes, blueSlopes, greenSlopes, snepPicture.rows, snepPicture.cols);
-//        printEdges(combinedSlopes, snepPicture.rows, snepPicture.cols);
+        //printEdges(combinedSlopes, snepPicture.rows, snepPicture.cols);
         cout << "Combined slopes into edgePixel array.\n";
 
         //step 7: Do nonmaximum suppression
         e.maxMagnitudeGradient(combinedSlopes, snepPicture.rows, snepPicture.cols);
-//        Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
+        //Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
         cout << endl;
-//        e.isLocalMax(combinedSlopes, 1, 1);
+        //e.isLocalMax(combinedSlopes, 1, 1);
         e.nonMaximumSuppression(combinedSlopes, snepPicture.rows, snepPicture.cols);
-//        Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
+        //Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
         cout << "Non maximum suppression finished.\n";
 
         //step 8: trace and threshold
@@ -404,8 +405,8 @@ void Canny(){
         cout << "Tracing and thresholding is done.\n";
 
         //step 9: save the output
-//        outputBoi.print("Output");
-        saveGreyscale("photoEdges2", outputBoi);
+        //outputBoi.print("Output");
+        saveGreyscale("cropE", outputBoi);
 
         cout << "Done.\n";
     } catch (string e) {

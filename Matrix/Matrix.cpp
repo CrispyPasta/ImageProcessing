@@ -566,5 +566,6 @@ Matrix<T>::~Matrix() {
 }
 
 template class Matrix<double>;
+template class Matrix<float>;
 template class Matrix<uint8_t>;
 template class Matrix<int>;
