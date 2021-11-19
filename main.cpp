@@ -209,6 +209,55 @@ void averageColorClassification() {
 
 }
 
+void biggerMixingQuantization() {
+    string blue_path = path + "Images/blue.jpg";
+    Mat blue = imread(blue_path, IMREAD_COLOR);
+
+    if (blue.empty()){
+        cout << "Blue image not loaded\n";
+        return;
+    }
+
+    string red_path = path + "Images/red.jpg";
+    Mat red = imread(red_path, IMREAD_COLOR);
+
+    if (red.empty()){
+        cout << "Red image not loaded\n";
+        return;
+    }
+
+    string mixed_path = path + "Images/redbluemixed2.jpg";
+    Mat mixed = imread(mixed_path, IMREAD_COLOR);
+
+    if (red.empty()){
+        cout << "Mixed image not loaded\n";
+        return;
+    }
+
+    string unmixed_path = path + "Images/redblueunmixed.jpg";
+    Mat unmixed = imread(unmixed_path, IMREAD_COLOR);
+
+    if (red.empty()){
+        cout << "Unmixed image not loaded\n";
+        return;
+    }
+
+    //    THIS SEQUENCE IS USED TO CLASSIFY THE AVERAGE COLOUR OF AN IMAGE
+    bgrPixel* redt = Utility::matToPixels(red);
+    Matrix<double>* redPixels = Color::bgrtoLab(redt, red.rows * red.cols);
+    bgrPixel* bluet = Utility::matToPixels(blue);
+    Matrix<double>* bluePixels = Color::bgrtoLab(bluet, red.rows * red.cols);
+    bgrPixel* mixedt = Utility::matToPixels(mixed);
+    Matrix<double>* mixedPixels = Color::bgrtoLab(mixedt, mixed.rows * mixed.cols);
+    bgrPixel* unmixedt = Utility::matToPixels(unmixed);
+    Matrix<double>* unmixedPixels = Color::bgrtoLab(unmixedt, unmixed.rows * unmixed.cols);
+
+
+
+    double mixinglevel = Mixing::quantifyMixing(mixedPixels, mixed.rows * mixed.cols, unmixedPixels, unmixed.rows * unmixed.cols);
+    cout << "RMI for the next function: " << mixinglevel << "\n\n";
+}
+
 void testMixingFunctions(){
     cout << "\n\n * * * * * MIXING * * * * * \n";
     try {
@@ -440,11 +489,12 @@ int main() {
 //    readImage();
 //    testMatrixFunctions();
 //    testColorConversion();
-//    testMixingFunctions();
+    testMixingFunctions();
 //    testEdgeDetection();
 //    Canny();
 //    testColorConversion();
     averageColorClassification();
+    biggerMixingQuantization();
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(end-start);
     cout << "Execution complete\n";
