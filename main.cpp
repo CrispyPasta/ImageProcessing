@@ -13,7 +13,7 @@ using namespace cv;
 using namespace chrono;
 
 bool verbose = false;
-string path = "/home/armandt/Desktop/project2021/ImageProcessing/";
+string path = "/home/armandt/Documents/ImageProcessing/";
 
 bool saveGreyscale(string name, Matrix<uint8_t>& imageMatrix){
     try {

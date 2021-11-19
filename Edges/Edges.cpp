@@ -18,8 +18,10 @@ Edges::Edges() {
     pp = 0;
     gaussianMatrix = Matrix<double>(size, size);
 
-    int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    int KxList[9] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
     int KyList[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+//    int KxList[9] = {3, 0, -3, 10, 0, -10, 3, 0, -3};
+//    int KyList[9] = {3, 10, 3, 0, 0, 0, -3, -10, -3};
     Kx = Matrix<int>(3, 3, KxList);
     Ky = Matrix<int>(3, 3, KyList);
 }
@@ -55,6 +57,8 @@ Edges::Edges(int s, double t) {
     gaussianMatrix = Matrix<double>(s, s);
     int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
     int KyList[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+//    int KxList[9] = {3, 0, -3, 10, 0, -10, 3, 0, -3};
+//    int KyList[9] = {3, 10, 3, 0, 0, 0, -3, -10, -3};
     Kx = Matrix<int>(3, 3, KxList);
     Ky = Matrix<int>(3, 3, KyList);
     threshold_lower = t;
