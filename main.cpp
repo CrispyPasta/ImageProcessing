@@ -191,7 +191,7 @@ void testColorConversion(){
 }
 
 void averageColorClassification() {
-    string image_path = path + "Images/darkblue.jpg";
+    string image_path = path + "Images/water.png";
     Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
     if (snepPicture.empty()){
@@ -200,62 +200,82 @@ void averageColorClassification() {
     }
 
     //    THIS SEQUENCE IS USED TO CLASSIFY THE AVERAGE COLOUR OF AN IMAGE
+
     bgrPixel* t = Utility::matToPixels(snepPicture);
     Matrix<double>* labPixels = Color::bgrtoLab(t, snepPicture.rows * snepPicture.cols);
     Matrix<double>* averageValue = Mixing::averageLab(labPixels, snepPicture.rows * snepPicture.cols);
+    averageValue->print("Average value");
     string color = Color::classifyColor(*averageValue);
     cout << "The color is: " << color << "\n\n";
+
     //    THIS SEQUENCE IS USED TO CLASSIFY THE AVERAGE COLOUR OF AN IMAGE
 
 }
 
 void biggerMixingQuantization() {
-    string blue_path = path + "Images/blue.jpg";
-    Mat blue = imread(blue_path, IMREAD_COLOR);
+//    string blue_path = path + "Images/blue.jpg";
+//    Mat blue = imread(blue_path, IMREAD_COLOR);
+//
+//    if (blue.empty()){
+//        cout << "Blue image not loaded\n";
+//        return;
+//    }
+//
+//    string red_path = path + "Images/red.jpg";
+//    Mat red = imread(red_path, IMREAD_COLOR);
+//
+//    if (red.empty()){
+//        cout << "Red image not loaded\n";
+//        return;
+//    }
 
-    if (blue.empty()){
-        cout << "Blue image not loaded\n";
-        return;
-    }
-
-    string red_path = path + "Images/red.jpg";
-    Mat red = imread(red_path, IMREAD_COLOR);
-
-    if (red.empty()){
-        cout << "Red image not loaded\n";
-        return;
-    }
-
-    string mixed_path = path + "Images/redbluemixed2.jpg";
+    string mixed_path = path + "Images/blue.jpg";
     Mat mixed = imread(mixed_path, IMREAD_COLOR);
 
-    if (red.empty()){
-        cout << "Mixed image not loaded\n";
-        return;
-    }
 
-    string unmixed_path = path + "Images/redblueunmixed.jpg";
-    Mat unmixed = imread(unmixed_path, IMREAD_COLOR);
+//    string unmixed_path = path + "Images/redblueunmixed.jpg";
+//    Mat unmixed = imread(unmixed_path, IMREAD_COLOR);
+//
+//    if (red.empty()){
+//        cout << "Unmixed image not loaded\n";
+//        return;
+//    }
 
-    if (red.empty()){
-        cout << "Unmixed image not loaded\n";
-        return;
-    }
+    string input1_path = path + "Images/blue.jpg";
+    Mat input1 = imread(input1_path, IMREAD_COLOR);
+    string input2_path = path + "Images/blue.jpg";
+    Mat input2 = imread(input2_path, IMREAD_COLOR);
 
     //    THIS SEQUENCE IS USED TO CLASSIFY THE AVERAGE COLOUR OF AN IMAGE
-    bgrPixel* redt = Utility::matToPixels(red);
-    Matrix<double>* redPixels = Color::bgrtoLab(redt, red.rows * red.cols);
-    bgrPixel* bluet = Utility::matToPixels(blue);
-    Matrix<double>* bluePixels = Color::bgrtoLab(bluet, red.rows * red.cols);
-    bgrPixel* mixedt = Utility::matToPixels(mixed);
-    Matrix<double>* mixedPixels = Color::bgrtoLab(mixedt, mixed.rows * mixed.cols);
-    bgrPixel* unmixedt = Utility::matToPixels(unmixed);
-    Matrix<double>* unmixedPixels = Color::bgrtoLab(unmixedt, unmixed.rows * unmixed.cols);
+//    bgrPixel* redt = Utility::matToPixels(red);
+//    Matrix<double>* redPixels = Color::bgrtoLab(redt, red.rows * red.cols);
+//    bgrPixel* bluet = Utility::matToPixels(blue);
+//    Matrix<double>* bluePixels = Color::bgrtoLab(bluet, red.rows * red.cols);
+//    bgrPixel* unmixedt = Utility::matToPixels(unmixed);
+//    Matrix<double>* unmixedPixels = Color::bgrtoLab(unmixedt, unmixed.rows * unmixed.cols);
+
+    for (int a = 0; a < 30; a++) {
+        bgrPixel* input1T = Utility::matToPixels(input1);
+        Matrix<double>* input1Mat = Color::bgrtoLab(input1T, input1.rows * input1.cols);
+
+        bgrPixel* input2T = Utility::matToPixels(input2);
+        Matrix<double>* input2Mat = Color::bgrtoLab(input2T, input2.rows * input2.cols);
+
+        bgrPixel* mixedt = Utility::matToPixels(mixed);
+        Matrix<double>* mixedPixels = Color::bgrtoLab(mixedt, mixed.rows * mixed.cols);
 
 
+//    double mixinglevel = Mixing::quantifyMixing(mixedPixels, mixed.rows * mixed.cols, unmixedPixels, unmixed.rows * unmixed.cols);
+//    cout << "RMI for the next function: " << mixinglevel << "\n\n";
 
-    double mixinglevel = Mixing::quantifyMixing(mixedPixels, mixed.rows * mixed.cols, unmixedPixels, unmixed.rows * unmixed.cols);
-    cout << "RMI for the next function: " << mixinglevel << "\n\n";
+        int M = mixed.rows * mixed.cols;
+        int N = input1.rows * input1.cols;
+        int Z = input2.rows * input2.cols;
+        double newMixing = Mixing::quantifyMixing(mixedPixels, M, input1Mat, N, input2Mat, Z);
+        cout << "RMI for the new function: " << newMixing << "\n\n";
+    }
+
+
 }
 
 void testMixingFunctions(){
@@ -396,14 +416,15 @@ void testEdgeDetection(){
     cout << "\n * * * * * EDGES * * * * * \n";
 }
 
-void Canny(){
+void Canny(bool threaded){
     try{
         //step 0: prep the gaussian matrix and the lower threshold
-        Edges e(5, 12);
+        Edges e(5, 4);
         e.generateGaussian();
 
         //step 1: load the picture
-        string image_path = path + "Images/cropped.jpg";
+        string filename = "sneppy";
+        string image_path = path + "Images/" + filename + ".jpg";
         Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
         if (snepPicture.empty()){
@@ -413,68 +434,103 @@ void Canny(){
         cout << "Image loaded!\n";
         //cout << snepPicture;
 
-        //step 2: split it into three channels
-        Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
-        Matrix<uint8_t>* blueImage = Edges::getBlue(snepPicture);
-        Matrix<uint8_t>* greenImage = Edges::getGreen(snepPicture);
+        Matrix<uint8_t> outputBoi = e.Canny(snepPicture, 12);
 
-        //step 3: expand the matrices
-        cout << "\nOriginal rows: " << redImage->rows << endl;
-        cout << "Original cols: " << redImage->cols << endl;
-        redImage->expandMatrix(1);
-        blueImage->expandMatrix(1);
-        greenImage->expandMatrix(1);
-        cout << "Expanded rows: " << redImage->rows << endl;
-        cout << "Expanded cols: " << redImage->cols << endl;
-
-        //step 4: Gaussian blur all of them
-        cout << "Blurring channels.\n";
-        e.gaussianBlur(*redImage);
-        e.gaussianBlur(*blueImage);
-        e.gaussianBlur(*greenImage);
-        cout << "Blurring finished.\n";
-
-        //step 5: Apply sobel to all the blurred matrices
-        slope** redSlopes = new slope*[snepPicture.rows];
-        slope** blueSlopes = new slope*[snepPicture.rows];
-        slope** greenSlopes = new slope*[snepPicture.rows];
-        for (int a = 0; a < snepPicture.rows; a++){
-            redSlopes[a] = new slope[snepPicture.cols];
-            blueSlopes[a] = new slope[snepPicture.cols];
-            greenSlopes[a] = new slope[snepPicture.cols];
-        }
-
-        e.sobelImage(*redImage, redSlopes);
-        e.sobelImage(*blueImage, blueSlopes);
-        e.sobelImage(*greenImage, greenSlopes);
-
-        //printSlopes(redSlopes, snepPicture.rows, snepPicture.cols);
-        //printSlopes(blueSlopes, snepPicture.rows, snepPicture.cols);
-        //printSlopes(greenSlopes, snepPicture.rows, snepPicture.cols);
-        cout << "Calculated sobel for each channel.\n";
-
-        //step 6: Combine the three channels back into one
-        edgePixel** combinedSlopes = e.slopesToEdges(redSlopes, blueSlopes, greenSlopes, snepPicture.rows, snepPicture.cols);
-        //printEdges(combinedSlopes, snepPicture.rows, snepPicture.cols);
-        cout << "Combined slopes into edgePixel array.\n";
-
-        //step 7: Do nonmaximum suppression
-        e.maxMagnitudeGradient(combinedSlopes, snepPicture.rows, snepPicture.cols);
-        //Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
-        cout << endl;
-        //e.isLocalMax(combinedSlopes, 1, 1);
-        e.nonMaximumSuppression(combinedSlopes, snepPicture.rows, snepPicture.cols);
-        //Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
-        cout << "Non maximum suppression finished.\n";
-
-        //step 8: trace and threshold
-        Matrix<uint8_t> outputBoi(snepPicture.rows, snepPicture.cols, static_cast<char>(0));
-        e.traceEdges(combinedSlopes, outputBoi, snepPicture.rows, snepPicture.cols);
-        cout << "Tracing and thresholding is done.\n";
+//        //step 2: split it into three channels
+//        Matrix<uint8_t>* redImage = Edges::getRed(snepPicture);
+//        Matrix<uint8_t>* blueImage = Edges::getBlue(snepPicture);
+//        Matrix<uint8_t>* greenImage = Edges::getGreen(snepPicture);
+//
+//        //step 3: expand the matrices
+//        cout << "\nOriginal rows: " << redImage->rows << endl;
+//        cout << "Original cols: " << redImage->cols << endl;
+//        if (threaded) {
+//            std::thread t1(&Matrix<uint8_t>::expandMatrix, redImage, 1);
+//            std::thread t2(&Matrix<uint8_t>::expandMatrix, blueImage, 1);
+//            std::thread t3(&Matrix<uint8_t>::expandMatrix, greenImage, 1);
+//
+//            t1.join();
+//            t2.join();
+//            t3.join();
+//        } else {
+//            redImage->expandMatrix(1);
+//            blueImage->expandMatrix(1);
+//            greenImage->expandMatrix(1);
+//
+//        }
+//        cout << "Expanded rows: " << redImage->rows << endl;
+//        cout << "Expanded cols: " << redImage->cols << endl;
+//
+//        //step 4: Gaussian blur all of them
+//        cout << "Blurring channels.\n";
+//        if (threaded) {
+//            std::thread t4(&Edges::gaussianBlur, e, ref(*redImage));
+//            std::thread t5(&Edges::gaussianBlur, e, ref(*blueImage));
+//            std::thread t6(&Edges::gaussianBlur, e, ref(*greenImage));
+//            t4.join();
+//            t5.join();
+//            t6.join();
+//        } else {
+//            e.gaussianBlur(*redImage);
+//            e.gaussianBlur(*blueImage);
+//            e.gaussianBlur(*greenImage);
+//        }
+//        cout << "Blurring finished.\n";
+//
+////
+////        std::thread t1(&Edges::tester, &e);
+////        t1.join();
+//
+//        //step 5: Apply sobel to all the blurred matrices
+//        slope** redSlopes = new slope*[snepPicture.rows];
+//        slope** blueSlopes = new slope*[snepPicture.rows];
+//        slope** greenSlopes = new slope*[snepPicture.rows];
+//        for (int a = 0; a < snepPicture.rows; a++){
+//            redSlopes[a] = new slope[snepPicture.cols];
+//            blueSlopes[a] = new slope[snepPicture.cols];
+//            greenSlopes[a] = new slope[snepPicture.cols];
+//        }
+//
+//        if (threaded) {
+//            thread t7(&Edges::sobelImage, e, ref(*redImage), ref(redSlopes));
+//            thread t8(&Edges::sobelImage, e, ref(*redImage), ref(redSlopes));
+//            thread t9(&Edges::sobelImage, e, ref(*redImage), ref(redSlopes));
+//            t7.join();
+//            t8.join();
+//            t9.join();
+//        } else {
+//            e.sobelImage(*redImage, redSlopes);
+//            e.sobelImage(*blueImage, blueSlopes);
+//            e.sobelImage(*greenImage, greenSlopes);
+//        }
+//
+//        //printSlopes(redSlopes, snepPicture.rows, snepPicture.cols);
+//        //printSlopes(blueSlopes, snepPicture.rows, snepPicture.cols);
+//        //printSlopes(greenSlopes, snepPicture.rows, snepPicture.cols);
+//        cout << "Calculated sobel for each channel.\n";
+//
+//        //step 6: Combine the three channels back into one
+//        edgePixel** combinedSlopes = e.slopesToEdges(redSlopes, blueSlopes, greenSlopes, snepPicture.rows, snepPicture.cols);
+//        //printEdges(combinedSlopes, snepPicture.rows, snepPicture.cols);
+//        cout << "Combined slopes into edgePixel array.\n";
+//
+//        //step 7: Do nonmaximum suppression
+//        e.maxMagnitudeGradient(combinedSlopes, snepPicture.rows, snepPicture.cols);
+//        //Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
+//        cout << endl;
+//        //e.isLocalMax(combinedSlopes, 1, 1);
+//        e.nonMaximumSuppression(combinedSlopes, snepPicture.rows, snepPicture.cols);
+//        //Utility::print(combinedSlopes, snepPicture.rows, snepPicture.cols);
+//        cout << "Non maximum suppression finished.\n";
+//
+//        //step 8: trace and threshold
+//        Matrix<uint8_t> outputBoi(snepPicture.rows, snepPicture.cols, static_cast<char>(0));
+//        e.traceEdges(combinedSlopes, outputBoi, snepPicture.rows, snepPicture.cols);
+//        cout << "Tracing and thresholding is done.\n";
 
         //step 9: save the output
         //outputBoi.print("Output");
-        saveGreyscale("cropE", outputBoi);
+        saveGreyscale(filename + "E", outputBoi);
 
         cout << "Done.\n";
     } catch (string e) {
@@ -489,15 +545,15 @@ int main() {
 //    readImage();
 //    testMatrixFunctions();
 //    testColorConversion();
-    testMixingFunctions();
+//    testMixingFunctions();
 //    testEdgeDetection();
-//    Canny();
+    Canny(true);
 //    testColorConversion();
-    averageColorClassification();
-    biggerMixingQuantization();
+//    averageColorClassification();
+//    biggerMixingQuantization();
     auto end = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(end-start);
+    auto duration = duration_cast<milliseconds>(end-start);
     cout << "Execution complete\n";
-    cout << "Time to execute: " << duration.count() << " microseconds.\n";
+    cout << "Time to execute: " << duration.count() << " milliseconds.\n";
     return 0;
 }

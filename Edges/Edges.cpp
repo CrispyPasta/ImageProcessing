@@ -15,7 +15,6 @@ using namespace std;
 Edges::Edges() {
     size = 7;
     k = 3;
-    pp = 0;
     gaussianMatrix = Matrix<double>(size, size);
 
     int KxList[9] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
@@ -52,7 +51,6 @@ Edges::Edges(int s, double t) {
     }
     size = s;
     k = (s - 1) / 2;
-    pp = 0;
     //matrix is an array of pointers
     gaussianMatrix = Matrix<double>(s, s);
     int KxList[9] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
@@ -93,6 +91,7 @@ void Edges::generateGaussian(double sig) {
 
     gaussianMatrix.print("Gaussian generated:", 5);
 }
+
 
 /**
  * This function will convolve the input matrix (an image) with the gaussian matrix.
@@ -223,13 +222,6 @@ void Edges::sobelImage(Matrix<uint8_t>& image, slope **output) {
  */
 bool Edges::isLocalMax(edgePixel **image, int u, int v) {
     double centerPixel = image[u][v].maxMag;            //center pixel, use its magnitude
-
-    if (pp == 0){
-        cout << "Non max suppression is underway\n";
-        // Utility::print(image, 12, 14);
-        // cout << "Non max suppression is underway\n\n";
-    }
-    pp++;
 
     if (centerPixel < threshold_lower){
         return false;
@@ -382,9 +374,6 @@ edgePixel **Edges::slopesToEdges(slope** red, slope** green, slope** blue, int r
             output[a][b] = {red[a][b].magnitude, red[a][b].direction,
                             green[a][b].magnitude, green[a][b].direction,
                             blue[a][b].magnitude, blue[a][b].direction};
-
-            // Utility::print(output[a][b]);
-            // cout << endl;
         }
     }
     // Utility::print(output, r, c);
@@ -444,4 +433,77 @@ Matrix<uint8_t> *Edges::toMatrix(Mat &image) {
  */
 void Edges::print(string caption, int s) {
     gaussianMatrix.print(caption, s);
+}
+
+/**
+ * Takes an OpenCV mat object and runs edge detection on it, returns the binary output.
+ * @param image : OpenCV mat object (for a color RGB image)
+ */
+Matrix<uint8_t> Edges::Canny(Mat &inputImage, int sensitivity)
+{
+    this->threshold_lower = sensitivity;
+    //step 2: split it into three channels
+    Matrix<uint8_t>* redImage = Edges::getRed(inputImage);
+    Matrix<uint8_t>* blueImage = Edges::getBlue(inputImage);
+    Matrix<uint8_t>* greenImage = Edges::getGreen(inputImage);
+
+    //step 3: expand the matrices
+//    cout << "\nOriginal rows: " << redImage->rows << endl;
+//    cout << "Original cols: " << redImage->cols << endl;
+    std::thread t1(&Matrix<uint8_t>::expandMatrix, redImage, 1);
+    std::thread t2(&Matrix<uint8_t>::expandMatrix, blueImage, 1);
+    std::thread t3(&Matrix<uint8_t>::expandMatrix, greenImage, 1);
+
+    t1.join();
+    t2.join();
+    t3.join();
+//    cout << "Expanded rows: " << redImage->rows << endl;
+//    cout << "Expanded cols: " << redImage->cols << endl;
+
+    //step 4: Gaussian blur all of them
+//    cout << "Blurring channels.\n";
+    std::thread t4(&Edges::gaussianBlur, this, ref(*redImage));
+    std::thread t5(&Edges::gaussianBlur, this, ref(*blueImage));
+    std::thread t6(&Edges::gaussianBlur, this, ref(*greenImage));
+    t4.join();
+    t5.join();
+    t6.join();
+//    cout << "Blurring finished.\n";
+
+    //step 5: Apply sobel to all the blurred matrices
+    auto redSlopes = new slope*[inputImage.rows];
+    auto blueSlopes = new slope*[inputImage.rows];
+    auto greenSlopes = new slope*[inputImage.rows];
+    for (int a = 0; a < inputImage.rows; a++){
+        redSlopes[a] = new slope[inputImage.cols];
+        blueSlopes[a] = new slope[inputImage.cols];
+        greenSlopes[a] = new slope[inputImage.cols];
+    }
+
+    thread t7(&Edges::sobelImage, this, ref(*redImage), ref(redSlopes));
+    thread t8(&Edges::sobelImage, this, ref(*redImage), ref(redSlopes));
+    thread t9(&Edges::sobelImage, this, ref(*redImage), ref(redSlopes));
+    t7.join();
+    t8.join();
+    t9.join();
+
+//    cout << "Calculated sobel for each channel.\n";
+
+    //step 6: Combine the three channels back into one
+    edgePixel** combinedSlopes = this->slopesToEdges(redSlopes, blueSlopes, greenSlopes, inputImage.rows, inputImage.cols);
+
+//    cout << "Combined slopes into edgePixel array.\n";
+
+    //step 7: Do nonmaximum suppression
+    this->maxMagnitudeGradient(combinedSlopes, inputImage.rows, inputImage.cols);
+
+    this->nonMaximumSuppression(combinedSlopes, inputImage.rows, inputImage.cols);
+//    cout << "Non maximum suppression finished.\n";
+
+    //step 8: trace and threshold
+    Matrix<uint8_t> outputBoi(inputImage.rows, inputImage.cols, static_cast<char>(0));
+    this->traceEdges(combinedSlopes, outputBoi, inputImage.rows, inputImage.cols);
+//    cout << "Tracing and thresholding is done.\n";
+
+    return outputBoi;
 }

@@ -12,6 +12,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <string>
 #include <cmath>
+#include <thread>
 using namespace cv;
 
 class Edges {
@@ -26,7 +27,7 @@ public:
     double sigma;
     int size;
     int k;
-    int pp;
+//    int pp;
     double gaussianTotal;
     double threshold_lower;
     Matrix<double> gaussianMatrix;
@@ -36,6 +37,7 @@ public:
     Edges(int s);
 
     Edges(int s, double t_low);
+
 
     void generateGaussian(double sig = 1.4142135624);
 
@@ -68,6 +70,8 @@ public:
     static Matrix<uint8_t>* getGreen(Mat& image);
 
     static Matrix<uint8_t>* toMatrix(Mat& image);
+
+    Matrix<uint8_t> Canny(Mat& image, int sensitivity);
 
     void print(std::string caption, int s = 5);
 
