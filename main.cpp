@@ -191,7 +191,7 @@ void testColorConversion(){
 }
 
 void averageColorClassification() {
-    string image_path = path + "Images/water.png";
+    string image_path = path + "Images/40blue.png";
     Mat snepPicture = imread(image_path, IMREAD_COLOR);
 
     if (snepPicture.empty()){
@@ -547,9 +547,9 @@ int main() {
 //    testColorConversion();
 //    testMixingFunctions();
 //    testEdgeDetection();
-    Canny(true);
+//    Canny(true);
 //    testColorConversion();
-//    averageColorClassification();
+    averageColorClassification();
 //    biggerMixingQuantization();
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end-start);

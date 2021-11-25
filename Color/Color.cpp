@@ -22,10 +22,71 @@ auto Green = Matrix<double>(3, 1, green);
 auto Yellow = Matrix<double>(3, 1, yellow);
 auto LightBlue = Matrix<double>(3, 1, lightBlue);
 
-Matrix<double> classificationColors[] = {Blue, Red, Green, Yellow, LightBlue};
+double blue20[3] = {48.178, -9.706, -13.369};
+double blue40[3] = {46.294, -13.289, -22.190};
+double blue60[3] = {34.691, -6.692, -28.208};
+double blue80[3] = {28.498, -1.135, -29.853};
+double blue100[3] = {23.562, 3.663, -31.702};
 
-std::string colorNames[] = {"Dark Blue", "Red", "Green", "Yellow", "Light Blue"};
-int numClassificationColors = 5;
+auto Blue20 = Matrix<double>(3, 1, blue20);
+auto Blue40 = Matrix<double>(3, 1, blue40);
+auto Blue60 = Matrix<double>(3, 1, blue60);
+auto Blue80 = Matrix<double>(3, 1, blue80);
+auto Blue100 = Matrix<double>(3, 1, blue100);
+
+double green20[3] = {53.653, -31.132, 19.784};
+double green40[3] = {41.375, -38.189, 23.376};
+double green60[3] = {47.798, -44.592, 27.329};
+double green80[3] = {44.965, -42.977, 28.115};
+double green100[3] = {34.335, -36.918, 22.844};
+
+auto Green20 = Matrix<double>(3, 1, green20);
+auto Green40 = Matrix<double>(3, 1, green40);
+auto Green60 = Matrix<double>(3, 1, green60);
+auto Green80 = Matrix<double>(3, 1, green80);
+auto Green100 = Matrix<double>(3, 1, green100);
+
+double red20[3] = {57.287,2.772, -2.277};
+double red40[3] = {47.358, 11.836, 1.106};
+double red60[3] = {35.950, 30.282, 7.789};
+double red80[3] = {28.704, 32.971, 11.669};
+double red100[3] = {24.612, 37.998, 14.182};
+
+auto Red20 = Matrix<double>(3, 1, red20);
+auto Red40 = Matrix<double>(3, 1, red40);
+auto Red60 = Matrix<double>(3, 1, red60);
+auto Red80 = Matrix<double>(3, 1, red80);
+auto Red100 = Matrix<double>(3, 1, red100);
+
+double yel20[3] = {59.104, -12.389, 19.626};
+double yel40[3] = {56.374, -15.439, 42.115};
+double yel60[3] = {55.043, -13.892, 54.140};
+double yel80[3] = {54.649, -10.138, 54.704};
+double yel100[3] = {51.651, -2.168, 54.030};
+
+auto Yel20 = Matrix<double>(3, 1, yel20);
+auto Yel40 = Matrix<double>(3, 1, yel40);
+auto Yel60 = Matrix<double>(3, 1, yel60);
+auto Yel80 = Matrix<double>(3, 1, yel80);
+auto Yel100 = Matrix<double>(3, 1, yel100);
+
+double water[3] = {55.822, -2.217, -2.970};
+auto Water = Matrix<double>(3, 1, water);
+
+
+//Matrix<double> classificationColors[] = {Blue, Red, Green, Yellow, LightBlue};
+Matrix<double> classificationColors[] = {Blue20, Blue40, Blue60, Blue80, Blue100,
+                                         Green20, Green40, Green60, Green80, Green100,
+                                         Red20, Red40, Red60, Red80, Red100,
+                                         Yel20, Yel40, Yel60, Yel80, Yel100,
+                                         Water};
+
+std::string colorNames[] = {"Blue 20%", "Blue 40%", "Blue 60%", "Blue 80%", "Blue 100%",
+                            "Green 20%", "Green 40%", "Green 60%", "Green 80%", "Green 100%",
+                            "Red 20%", "Red 40%", "Red 60%", "Red 80%", "Red 100%",
+                            "Yellow 20%", "Yellow 40%", "Yellow 60%", "Yellow 80%", "Yellow 100%",
+                            "Clear/Water"};
+int numClassificationColors = 21;
 //* * * * * * * * * CLASSIFICATION COLORS * * * * * * * * *
 
 
