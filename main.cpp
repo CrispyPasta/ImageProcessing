@@ -7,6 +7,7 @@
 #include "Color/Color.h"
 #include "Mixing/Mixing.h"
 #include "Edges/Edges.h"
+#include "Histogram/Histogram.h"
 
 using namespace std;
 using namespace cv;
@@ -539,6 +540,51 @@ void Canny(bool threaded){
     }
 }
 
+void histogram() {
+    string image_path = path + "Images/100E.jpg";
+    Mat snepPicture = imread(image_path);
+
+    if (snepPicture.empty()){
+        cout << "Image not loaded\n";
+        return;
+    }
+    cout << "Image loaded!\n";
+
+    Histogram h(snepPicture);
+    h.generateHistogram();
+    cout << (h.findPeak()) << '\n';
+
+    image_path = path + "Images/101E.jpg";
+    snepPicture = imread(image_path);
+    h.generateHistogram();
+    cout << "Peak pos:  " << (h.findPeak()) << "%\n";
+    cout << "Flow rate: " << h.getFlowRate(10000) << " %/s\n";       //10 ms
+
+    image_path = path + "Images/102E.jpg";
+    snepPicture = imread(image_path);
+    h.generateHistogram();
+    cout << "Peak pos:  " << (h.findPeak()) << "%\n";
+    cout << "Flow rate: " << h.getFlowRate(20000) << " %/s\n";       //10 ms
+
+    image_path = path + "Images/103E.jpg";
+    snepPicture = imread(image_path);
+    h.generateHistogram();
+    cout << "Peak pos:  " <<  (h.findPeak()) << "%\n";
+    cout << "Flow rate: " << h.getFlowRate(30000) << " %/s\n";       //10 ms
+
+    image_path = path + "Images/104E.jpg";
+    snepPicture = imread(image_path);
+    h.generateHistogram();
+    cout << "Peak pos:  " <<  (h.findPeak()) << "%\n";
+    cout << "Flow rate: " << h.getFlowRate(40000) << " %/s\n";       //10 ms
+
+    image_path = path + "Images/105E.jpg";
+    snepPicture = imread(image_path);
+    h.generateHistogram();
+    cout << "Peak pos:  " <<  (h.findPeak()) << "%\n";
+    cout << "Flow rate: " << h.getFlowRate(50000) << " %/s\n";       //10 ms
+}
+
 int main() {
     auto start = high_resolution_clock::now();
 
@@ -549,7 +595,8 @@ int main() {
 //    testEdgeDetection();
 //    Canny(true);
 //    testColorConversion();
-    averageColorClassification();
+//    averageColorClassification();
+    histogram();
 //    biggerMixingQuantization();
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end-start);
